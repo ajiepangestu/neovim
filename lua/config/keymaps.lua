@@ -68,25 +68,46 @@ vim.keymap.set("n", "<leader>d", function()
     return
   end
 
-  local editor_count = 0
-  for _, w in ipairs(vim.api.nvim_list_wins()) do
-    local b = vim.api.nvim_win_get_buf(w)
-    local f = vim.bo[b].filetype
-    if f ~= "snacks_explorer" and f ~= "neo-tree" then
-      editor_count = editor_count + 1
-    end
+  local buftype = vim.bo[buf].buftype
+  if buftype == "quickfix" or buftype == "help" then
+    vim.cmd("close")
+    return
   end
 
-  if editor_count <= 1 then
-    vim.cmd("bdelete!")
-    vim.defer_fn(function()
+  vim.cmd("bdelete!")
+
+  vim.defer_fn(function()
+    local has_real_buffer = false
+    for _, w in ipairs(vim.api.nvim_list_wins()) do
+      local b = vim.api.nvim_win_get_buf(w)
+      local f = vim.bo[b].filetype
+      local bt = vim.bo[b].buftype
+      if f ~= "snacks_explorer" and f ~= "neo-tree" and bt == "" then
+        local name = vim.api.nvim_buf_get_name(b)
+        if name ~= "" then
+          has_real_buffer = true
+          break
+        end
+      end
+    end
+
+    if not has_real_buffer then
       focus_explorer()
-    end, 50)
-  else
-    vim.cmd("bdelete!")
-  end
+    end
+  end, 50)
 end, { desc = "Close current focus" })
 
 vim.keymap.set("n", "<leader>q", function()
-  focus_explorer()
+  local wins = vim.api.nvim_list_wins()
+  for _, win in ipairs(wins) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local ft = vim.bo[buf].filetype
+    if ft ~= "snacks_explorer" and ft ~= "neo-tree" then
+      pcall(vim.cmd, "bdelete!")
+    end
+  end
+
+  vim.defer_fn(function()
+    focus_explorer()
+  end, 50)
 end, { desc = "Close all except explorer" })

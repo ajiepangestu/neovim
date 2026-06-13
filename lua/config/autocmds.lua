@@ -1,20 +1,25 @@
 vim.api.nvim_create_autocmd({ "BufDelete", "WinClosed" }, {
   callback = function()
     vim.schedule(function()
-      local has_editor = false
+      local has_real_buffer = false
       local explorer_win = nil
 
       for _, w in ipairs(vim.api.nvim_list_wins()) do
         local b = vim.api.nvim_win_get_buf(w)
         local f = vim.bo[b].filetype
-        if f ~= "snacks_explorer" and f ~= "neo-tree" then
-          has_editor = true
-        elseif f == "snacks_explorer" or f == "neo-tree" then
+        local bt = vim.bo[b].buftype
+        
+        if f == "snacks_explorer" or f == "neo-tree" then
           explorer_win = w
+        elseif bt == "" then
+          local name = vim.api.nvim_buf_get_name(b)
+          if name ~= "" then
+            has_real_buffer = true
+          end
         end
       end
 
-      if not has_editor then
+      if not has_real_buffer then
         if not explorer_win then
           require("snacks").explorer()
           vim.wait(100, function() end)
