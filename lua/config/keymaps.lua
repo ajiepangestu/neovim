@@ -30,5 +30,7 @@ vim.keymap.set({ "n", "t" }, "<leader>t", function()
 	Snacks.terminal.toggle(nil, { cwd = LazyVim.root() })
 end, { desc = "Toggle terminal" })
 
+vim.keymap.set("n", "<leader>d", ":q<CR>", { desc = "Quit" })
+
 -- Motion
 vim.keymap.set("n", ",,", "<Cmd>normal! ;<CR>", { desc = "Repeat f/t forward" })
