@@ -62,10 +62,21 @@ vim.keymap.set("n", "<leader>d", function()
   vim.cmd("bdelete!")
 
   vim.defer_fn(function()
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(b) then
+        local name = vim.api.nvim_buf_get_name(b)
+        local bft = vim.bo[b].filetype
+        if bft ~= "snacks_explorer" and name == "" then
+          vim.cmd("silent! bdelete!")
+        end
+      end
+    end
+
     if not has_real_buffers() then
       local explorer_win = get_explorer_win()
       if explorer_win then
         vim.api.nvim_set_current_win(explorer_win)
+        vim.cmd("only")
       end
     end
   end, 50)
@@ -82,6 +93,16 @@ vim.keymap.set("n", "<leader>q", function()
   end
 
   vim.defer_fn(function()
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(b) then
+        local name = vim.api.nvim_buf_get_name(b)
+        local bft = vim.bo[b].filetype
+        if bft ~= "snacks_explorer" and name == "" then
+          vim.cmd("silent! bdelete!")
+        end
+      end
+    end
+
     local explorer_win = get_explorer_win()
     if not explorer_win then
       require("snacks").explorer()
