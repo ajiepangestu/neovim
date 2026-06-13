@@ -41,38 +41,52 @@ vim.keymap.set("n", "<leader>d", function()
   local buftype = vim.bo[buf].buftype
   if buftype == "quickfix" or buftype == "help" then
     vim.cmd("close")
-  else
-    vim.cmd("bdelete")
+    return
   end
 
-  vim.schedule(function()
-    local has_editor = false
-    for _, w in ipairs(vim.api.nvim_list_wins()) do
-      local b = vim.api.nvim_win_get_buf(w)
-      local f = vim.bo[b].filetype
-      if f ~= "snacks_explorer" and f ~= "neo-tree" then
-        has_editor = true
-        break
-      end
+  local editor_count = 0
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    local b = vim.api.nvim_win_get_buf(w)
+    local f = vim.bo[b].filetype
+    if f ~= "snacks_explorer" and f ~= "neo-tree" then
+      editor_count = editor_count + 1
     end
+  end
 
-    if not has_editor then
-      local explorer_found = false
+  if editor_count <= 1 then
+    vim.cmd("bdelete")
+    vim.schedule(function()
+      local explorer_win = nil
       for _, w in ipairs(vim.api.nvim_list_wins()) do
         local b = vim.api.nvim_win_get_buf(w)
         local f = vim.bo[b].filetype
         if f == "snacks_explorer" or f == "neo-tree" then
-          vim.api.nvim_set_current_win(w)
-          explorer_found = true
+          explorer_win = w
           break
         end
       end
 
-      if not explorer_found then
+      if not explorer_win then
         require("snacks").explorer()
+        vim.wait(100)
+        for _, w in ipairs(vim.api.nvim_list_wins()) do
+          local b = vim.api.nvim_win_get_buf(w)
+          local f = vim.bo[b].filetype
+          if f == "snacks_explorer" or f == "neo-tree" then
+            explorer_win = w
+            break
+          end
+        end
       end
-    end
-  end)
+
+      if explorer_win and vim.api.nvim_win_is_valid(explorer_win) then
+        vim.api.nvim_set_current_win(explorer_win)
+        vim.cmd("only")
+      end
+    end)
+  else
+    vim.cmd("bdelete")
+  end
 end, { desc = "Close current focus" })
 
 vim.keymap.set("n", "<leader>q", function()
