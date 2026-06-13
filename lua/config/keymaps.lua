@@ -68,21 +68,43 @@ vim.keymap.set("n", "<leader>d", function()
 end, { desc = "Close current focus" })
 
 vim.keymap.set("n", "<leader>q", function()
-  local wins = vim.api.nvim_list_wins()
-  for _, win in ipairs(wins) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    local ft = vim.bo[buf].filetype
-    if ft ~= "snacks_explorer" and ft ~= "neo-tree" then
-      pcall(vim.api.nvim_win_close, win, true)
-    end
-  end
+  local snacks = require("snacks")
+  local explorer_win = nil
 
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
     local ft = vim.bo[buf].filetype
     if ft == "snacks_explorer" or ft == "neo-tree" then
-      vim.api.nvim_set_current_win(win)
+      explorer_win = win
       break
     end
+  end
+
+  if not explorer_win then
+    snacks.explorer()
+    vim.wait(100)
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      local ft = vim.bo[buf].filetype
+      if ft == "snacks_explorer" or ft == "neo-tree" then
+        explorer_win = win
+        break
+      end
+    end
+  end
+
+  local wins = vim.api.nvim_list_wins()
+  for _, win in ipairs(wins) do
+    if win ~= explorer_win then
+      local buf = vim.api.nvim_win_get_buf(win)
+      local ft = vim.bo[buf].filetype
+      if ft ~= "snacks_explorer" and ft ~= "neo-tree" then
+        pcall(vim.api.nvim_win_close, win, true)
+      end
+    end
+  end
+
+  if explorer_win and vim.api.nvim_win_is_valid(explorer_win) then
+    vim.api.nvim_set_current_win(explorer_win)
   end
 end, { desc = "Close all except explorer" })
