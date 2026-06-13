@@ -45,58 +45,51 @@ vim.keymap.set("n", "<leader>d", function()
     vim.cmd("bdelete")
   end
 
-  local has_editor = false
-  for _, w in ipairs(vim.api.nvim_list_wins()) do
-    local b = vim.api.nvim_win_get_buf(w)
-    local f = vim.bo[b].filetype
-    if f ~= "snacks_explorer" and f ~= "neo-tree" then
-      has_editor = true
-      break
-    end
-  end
-
-  if not has_editor then
+  vim.schedule(function()
+    local has_editor = false
     for _, w in ipairs(vim.api.nvim_list_wins()) do
       local b = vim.api.nvim_win_get_buf(w)
       local f = vim.bo[b].filetype
-      if f == "snacks_explorer" or f == "neo-tree" then
-        vim.api.nvim_set_current_win(w)
+      if f ~= "snacks_explorer" and f ~= "neo-tree" then
+        has_editor = true
         break
       end
     end
-  end
+
+    if not has_editor then
+      local explorer_found = false
+      for _, w in ipairs(vim.api.nvim_list_wins()) do
+        local b = vim.api.nvim_win_get_buf(w)
+        local f = vim.bo[b].filetype
+        if f == "snacks_explorer" or f == "neo-tree" then
+          vim.api.nvim_set_current_win(w)
+          explorer_found = true
+          break
+        end
+      end
+
+      if not explorer_found then
+        require("snacks").explorer()
+      end
+    end
+  end)
 end, { desc = "Close current focus" })
 
 vim.keymap.set("n", "<leader>q", function()
   local explorer_win = nil
-  local explorer_buf = nil
 
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
     local ft = vim.bo[buf].filetype
     if ft == "snacks_explorer" or ft == "neo-tree" then
       explorer_win = win
-      explorer_buf = buf
       break
     end
   end
 
-  local wins = vim.api.nvim_list_wins()
-  for _, win in ipairs(wins) do
-    if win ~= explorer_win then
-      local buf = vim.api.nvim_win_get_buf(win)
-      local ft = vim.bo[buf].filetype
-      if ft ~= "snacks_explorer" and ft ~= "neo-tree" then
-        vim.cmd("silent! bdelete!")
-      end
-    end
-  end
-
-  vim.wait(50)
-
   if not explorer_win then
     require("snacks").explorer()
-    vim.wait(100)
+    vim.wait(200)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
       local buf = vim.api.nvim_win_get_buf(win)
       local ft = vim.bo[buf].filetype
@@ -109,5 +102,6 @@ vim.keymap.set("n", "<leader>q", function()
 
   if explorer_win and vim.api.nvim_win_is_valid(explorer_win) then
     vim.api.nvim_set_current_win(explorer_win)
+    vim.cmd("only")
   end
 end, { desc = "Close all except explorer" })
