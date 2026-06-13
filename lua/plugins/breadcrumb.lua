@@ -55,8 +55,8 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
-      show_dirname = false,
-      show_basename = false,
+      show_dirname = true,
+      show_basename = true,
       theme = {
         normal = { bg = "#2d2d2d", fg = "#ff9e64" },
         separator = { fg = "#666666" },
@@ -128,9 +128,16 @@ return {
 
       opts.options = {
         component_separators = { left = "", right = "" },
-        section_separators = { left = "", right = "" },
+        section_separators = { left = " ", right = " " },
         theme = orange_theme,
       }
+
+      for i, section in ipairs(opts.sections.lualine_b) do
+        if type(section) == "table" and section[1] == "filename" then
+          table.remove(opts.sections.lualine_b, i)
+          break
+        end
+      end
     end,
   },
 }
