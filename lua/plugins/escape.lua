@@ -5,13 +5,7 @@ return {
 		opts = {
 			timeout = 300,
 			default_mappings = false,
-			mappings = {
-				i = {
-					j = {
-						j = "<Esc>",
-					},
-				},
-			},
+			mappings = { i = { j = { j = "<Esc>" } } },
 		},
 	},
 }

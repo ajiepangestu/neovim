@@ -1,0 +1,16 @@
+return {
+	{
+		"olrtg/nvim-emmet",
+		ft = { "html", "typescriptreact", "javascriptreact", "htmlangular" },
+		keys = {
+			{ "<C-e>", mode = "i", desc = "Emmet expand" },
+		},
+		config = function()
+			require("nvim-emmet").setup()
+		end,
+	},
+	{
+		"mason-org/mason.nvim",
+		opts = { ensure_installed = { "eslint-lsp", "prettierd" } },
+	},
+}

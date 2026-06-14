@@ -1,7 +1,7 @@
--- Leader keys
 vim.g.mapleader = ";"
 vim.g.maplocalleader = ";"
 
--- UI options
 vim.opt.showtabline = 0
 vim.opt.relativenumber = false
+vim.opt.guifont = "Iosevka Nerd Font Mono:h11"
+vim.opt.clipboard = "unnamedplus"
