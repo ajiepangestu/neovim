@@ -11,6 +11,12 @@
 | `:LazyGitFilter` | Open LazyGit with filter |
 | `:LazyGitFilterCurrentFile` | Open LazyGit filtered to current file |
 
+## Project Setup
+
+| Command | Description |
+|---------|-------------|
+| `:MonorepoSetup` | Auto-generate config files for monorepo (Django + Next.js) |
+
 ## LSP Commands (Neovim Built-in)
 
 | Command | Description |

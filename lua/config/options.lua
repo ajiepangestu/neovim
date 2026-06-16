@@ -6,6 +6,7 @@ vim.g.maplocalleader = ";"
 vim.g.lazyvim_python_lsp = "basedpyright"
 
 require("config.keymaps")
+require("config.monorepo")
 
 -- UI & behavior
 vim.opt.showtabline = 0          -- hide tabline

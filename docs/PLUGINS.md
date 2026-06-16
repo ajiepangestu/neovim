@@ -43,6 +43,12 @@
 
 See [DJANGO_SETUP.md](./DJANGO_SETUP.md) for complete guide on fixing Django `objects` attribute errors with basedpyright + django-stubs.
 
+### Monorepo Setup
+
+See [MONOREPO_SETUP.md](./MONOREPO_SETUP.md) for setting up monorepo projects with Django API + Next.js frontend.
+
+Use `:MonorepoSetup` command to auto-generate config files.
+
 ## Language Support
 
 | Plugin | Description |
