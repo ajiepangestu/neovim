@@ -48,13 +48,19 @@
 
 | Plugin | Description |
 |--------|-------------|
+| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column (LazyVim default) |
 | [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) | LazyGit integration |
+| [git-blame.nvim](https://github.com/f-person/git-blame.nvim) | Inline git blame (like GitLens) |
+| [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Enhanced diff viewer for git changes |
 
 ## Quality of Life
 
 | Plugin | Description |
 |--------|-------------|
 | [better-escape.nvim](https://github.com/max397574/better-escape.nvim) | Exit insert mode with `jj` |
+| [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets/parentheses |
+| [editorconfig.nvim](https://github.com/gpanders/editorconfig.nvim) | EditorConfig support |
+| [spellsitter.nvim](https://github.com/lewis6991/spellsitter.nvim) | Spell checking with treesitter |
 
 ## LazyVim Extras (via lazyvim.json)
 

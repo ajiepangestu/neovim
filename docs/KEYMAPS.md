@@ -54,6 +54,17 @@ Neovim 0.12 built-in defaults (`K`, `grd`, `grD`, `gri`, `grt`, `grr`, `gra`, `g
 | `<leader>tv` | n, t | Terminal split vertical   |
 | `<leader>gg` | n    | Open LazyGit              |
 
+## Git
+
+| Key          | Mode | Action              |
+| ------------ | ---- | ------------------- |
+| `<leader>gb` | n    | Toggle git blame    |
+| `<leader>go` | n    | Open commit URL     |
+| `<leader>gc` | n    | Copy commit URL     |
+| `<leader>gf` | n    | Copy file URL       |
+| `<leader>gd` | n    | Open diff view      |
+| `<leader>gh` | n    | File history        |
+
 ## Copilot (Insert Mode)
 
 | Key     | Action              |
