@@ -1,38 +1,38 @@
-vim.diagnostic.config({ virtual_text = false })
-
+-- Apply diagnostic config after LazyVim loads (LazyVim overrides it at startup)
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
 	callback = function(args)
-		local opts = { buffer = args.buf }
-		local wk = vim.keymap.set
+		vim.diagnostic.config({ virtual_text = false })
 
-		wk("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-		wk("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
-		wk("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Go to references" }))
-		wk("n", "gI", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
-		wk("n", "gy", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
-		wk("n", "gh", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
-		wk("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
-		wk("n", "<C-k>", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature help" }))
+		local map = function(keys, func, desc)
+			vim.keymap.set("n", keys, func, { buffer = args.buf, desc = desc })
+		end
 
-		wk("n", "<space>a", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
-		wk("n", "<space>f", function() vim.lsp.buf.format({ async = true }) end, vim.tbl_extend("force", opts, { desc = "Format" }))
-		wk("n", "<space>r", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
+		-- Custom navigation (Neovim 0.12 defaults: grd, grD, gri, grt, grr, K already set)
+		map("gd", vim.lsp.buf.definition, "Go to definition")
+		map("gh", vim.lsp.buf.hover, "Hover")
+		map("<C-k>", vim.lsp.buf.signature_help, "Signature help")
 
-		wk("n", "<space>s", vim.lsp.buf.workspace_symbol, vim.tbl_extend("force", opts, { desc = "Workspace symbol" }))
-		wk("n", "<space>d", vim.lsp.buf.document_symbol, vim.tbl_extend("force", opts, { desc = "Document symbol" }))
+		-- Actions
+		map("<space>a", vim.lsp.buf.code_action, "Code action")
+		map("<space>f", function() vim.lsp.buf.format({ async = true }) end, "Format")
+		map("<space>r", vim.lsp.buf.rename, "Rename")
 
-		wk("n", "E", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Show diagnostic" }))
+		-- Symbols
+		map("<space>s", vim.lsp.buf.workspace_symbol, "Workspace symbol")
+		map("<space>d", vim.lsp.buf.document_symbol, "Document symbol")
 
-		wk("n", "]d", function()
-			vim.diagnostic.jump(vim.v.count1)
-			vim.defer_fn(vim.diagnostic.open_float, 50)
-		end, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
-		wk("n", "[d", function()
-			vim.diagnostic.jump(-vim.v.count1)
-			vim.defer_fn(vim.diagnostic.open_float, 50)
-		end, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
-		wk("n", "<leader>le", function() Snacks.picker.diagnostics({ buf = 0 }) end, vim.tbl_extend("force", opts, { desc = "Buffer diagnostics" }))
-		wk("n", "<leader>lE", function() Snacks.picker.diagnostics() end, vim.tbl_extend("force", opts, { desc = "All diagnostics" }))
+		-- Diagnostics
+		map("E", vim.diagnostic.open_float, "Show diagnostic")
+		map("]d", function()
+			vim.diagnostic.jump({ count = vim.v.count1 })
+			vim.schedule(vim.diagnostic.open_float)
+		end, "Next diagnostic")
+		map("[d", function()
+			vim.diagnostic.jump({ count = -vim.v.count1 })
+			vim.schedule(vim.diagnostic.open_float)
+		end, "Previous diagnostic")
+		map("<leader>le", function() Snacks.picker.diagnostics({ buf = 0 }) end, "Buffer diagnostics")
+		map("<leader>lE", function() Snacks.picker.diagnostics() end, "All diagnostics")
 	end,
 })
