@@ -22,6 +22,61 @@ local function write_file(path, content)
 	return false
 end
 
+local function validate_python_module(name)
+	if not name or name == "" then
+		return false, "Module name cannot be empty"
+	end
+	if name:match("^%d") then
+		return false, "Module name cannot start with a number"
+	end
+	if not name:match("^[%a_][%w_]*$") then
+		return false, "Module name can only contain letters, numbers, and underscores"
+	end
+	return true
+end
+
+local function validate_settings_module(settings_module)
+	if not settings_module or settings_module == "" then
+		return false, "Settings module cannot be empty"
+	end
+
+	local parts = vim.split(settings_module, ".", { plain = true })
+	for _, part in ipairs(parts) do
+		local valid, err = validate_python_module(part)
+		if not valid then
+			return false, string.format("Invalid module part '%s': %s", part, err)
+		end
+	end
+
+	if #parts < 2 then
+		return false, "Settings module should be in format 'project.settings'"
+	end
+
+	return true
+end
+
+local function detect_django_folder(root_path)
+	local candidates = { "api", "backend", "server", "django", "app", "python" }
+
+	for _, folder in ipairs(candidates) do
+		local path = root_path .. "/" .. folder
+		if vim.fn.isdirectory(path) then
+			if file_exists(path .. "/manage.py") or file_exists(path .. "/requirements.txt") then
+				return folder
+			end
+		end
+	end
+
+	for _, item in ipairs(vim.fn.readdir(root_path)) do
+		local path = root_path .. "/" .. item
+		if vim.fn.isdirectory(path) and file_exists(path .. "/manage.py") then
+			return item
+		end
+	end
+
+	return nil
+end
+
 local function create_pyright_config(api_path, settings_module)
 	local config = string.format([[{
   "venvPath": ".",
@@ -88,46 +143,70 @@ end
 local function setup_monorepo()
 	local cwd = vim.fn.getcwd()
 
-	-- Check if api folder exists
-	local api_path = cwd .. "/api"
-	if not vim.fn.isdirectory(api_path) then
-		vim.notify("api/ folder not found in " .. cwd, vim.log.levels.ERROR)
-		vim.notify("Please run this command from the monorepo root directory", vim.log.levels.INFO)
+	local django_folder = detect_django_folder(cwd)
+	if not django_folder then
+		vim.notify("No Django project folder found in " .. cwd, vim.log.levels.ERROR)
+		vim.notify("Expected folder with manage.py: api/, backend/, server/, django/, app/, or python/", vim.log.levels.INFO)
 		return
 	end
 
-	-- Prompt for Django settings module
+	local api_path = cwd .. "/" .. django_folder
+
 	vim.ui.input({
-		prompt = "Django settings module (e.g., myproject.settings): ",
-		default = "myproject.settings",
-	}, function(settings_module)
-		if not settings_module or settings_module == "" then
+		prompt = "Django folder: ",
+		default = django_folder,
+	}, function(folder_name)
+		if not folder_name or folder_name == "" then
 			vim.notify("Cancelled", vim.log.levels.INFO)
 			return
 		end
 
-		-- Create configs
-		local created = 0
-		if create_pyright_config(api_path, settings_module) then
-			created = created + 1
-		end
-		if create_editorconfig(cwd) then
-			created = created + 1
+		local final_api_path = cwd .. "/" .. folder_name
+		if not vim.fn.isdirectory(final_api_path) then
+			vim.notify("Folder " .. folder_name .. " does not exist", vim.log.levels.ERROR)
+			return
 		end
 
-		if created > 0 then
-			vim.notify(string.format("Created %d config file(s)", created), vim.log.levels.INFO)
-			vim.notify("\nNext steps:", vim.log.levels.INFO)
-			vim.notify("1. cd api && python -m venv .venv && source .venv/bin/activate", vim.log.levels.INFO)
-			vim.notify("2. pip install django django-stubs[compatible-mypy] ruff", vim.log.levels.INFO)
-			vim.notify("3. Restart LSP: :LspRestart", vim.log.levels.INFO)
-		else
-			vim.notify("No files created (already exist?)", vim.log.levels.WARN)
-		end
+		local project_name = folder_name:gsub("-", "_"):gsub("^%l", string.upper)
+		local default_settings = project_name:lower() .. ".settings"
+
+		vim.ui.input({
+			prompt = "Django settings module: ",
+			default = default_settings,
+		}, function(settings_module)
+			if not settings_module or settings_module == "" then
+				vim.notify("Cancelled", vim.log.levels.INFO)
+				return
+			end
+
+			local valid, err = validate_settings_module(settings_module)
+			if not valid then
+				vim.notify("Invalid settings module: " .. err, vim.log.levels.ERROR)
+				vim.notify("Example: myproject.settings", vim.log.levels.INFO)
+				return
+			end
+
+			local created = 0
+			if create_pyright_config(final_api_path, settings_module) then
+				created = created + 1
+			end
+			if create_editorconfig(cwd) then
+				created = created + 1
+			end
+
+			if created > 0 then
+				vim.notify(string.format("Created %d config file(s)", created), vim.log.levels.INFO)
+				vim.notify("\nNext steps:", vim.log.levels.INFO)
+				vim.notify("1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate", vim.log.levels.INFO)
+				vim.notify("2. pip install django django-stubs[compatible-mypy] ruff", vim.log.levels.INFO)
+				vim.notify("3. Restart LSP: :LspRestart", vim.log.levels.INFO)
+			else
+				vim.notify("No files created (already exist?)", vim.log.levels.WARN)
+			end
+		end)
 	end)
 end
 
--- Create user command
 vim.api.nvim_create_user_command("MonorepoSetup", setup_monorepo, {
 	desc = "Setup monorepo config files (Django + Next.js)",
 })
