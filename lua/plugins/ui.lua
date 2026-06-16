@@ -61,6 +61,20 @@ return {
 				lualine_x = {
 					Snacks.profiler.status(),
 					{
+						function()
+							local venv = vim.env.VIRTUAL_ENV
+							if venv then
+								local name = vim.fn.fnamemodify(venv, ":t")
+								return " " .. name
+							end
+							return ""
+						end,
+						cond = function()
+							return vim.bo.filetype == "python" and vim.env.VIRTUAL_ENV ~= nil
+						end,
+						color = function() return { fg = Snacks.util.color("String") } end,
+					},
+					{
 						function() return require("noice").api.status.command.get() end,
 						cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
 						color = function() return { fg = Snacks.util.color("Statement") } end,
