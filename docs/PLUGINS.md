@@ -27,7 +27,16 @@
 
 | Plugin | Description |
 |--------|-------------|
-| [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter (Python via ruff) |
+| [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter manager (see Formatters by Filetype below) |
+
+### Formatters by Filetype
+
+| Filetype | Formatter |
+|----------|-----------|
+| Python, Django | `ruff` |
+| C# (.NET) | `csharpier` |
+| TypeScript, JavaScript, TSX, JSX | `prettier` |
+| HTML, CSS, JSON, YAML, Markdown | `prettier` |
 
 ## Language Support
 
@@ -62,6 +71,7 @@
 
 | Tool | Purpose |
 |------|---------|
+| `csharpier` | C# code formatter |
 | `djlint` | Django template linter/formatter |
 | `eslint-lsp` | ESLint language server |
 | `prettierd` | Prettier daemon formatter |
