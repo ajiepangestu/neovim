@@ -43,6 +43,29 @@ Neovim 0.12 built-in defaults (`K`, `grd`, `grD`, `gri`, `grt`, `grr`, `gra`, `g
 | `<leader>le` | n    | Buffer diagnostics picker |
 | `<leader>lE` | n    | All diagnostics picker    |
 
+## Search
+
+| Key          | Mode | Action                        |
+| ------------ | ---- | ----------------------------- |
+| `<leader>sg` | n    | Search global (Spectre)       |
+| `<leader>sw` | n    | Search word under cursor      |
+| `<leader>sf` | n    | Search in current file        |
+
+### Spectre Keymaps (in search buffer)
+
+| Key          | Action              |
+| ------------ | ------------------- |
+| `dd`         | Toggle item         |
+| `<CR>`       | Open file           |
+| `<leader>q`  | Send to quickfix    |
+| `<leader>c`  | Replace command     |
+| `<leader>o`  | Show options        |
+| `<leader>rc` | Replace current line|
+| `<leader>R`  | Replace all         |
+| `<leader>v`  | Change view mode    |
+| `ti`         | Toggle ignore case  |
+| `th`         | Toggle hidden files |
+
 ## Plugins
 
 | Key          | Mode | Action                    |

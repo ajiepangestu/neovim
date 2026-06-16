@@ -64,6 +64,12 @@ Use `:MonorepoSetup` command to auto-generate config files.
 | [git-blame.nvim](https://github.com/f-person/git-blame.nvim) | Inline git blame (like GitLens) |
 | [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Enhanced diff viewer for git changes |
 
+## Search & Replace
+
+| Plugin | Description |
+|--------|-------------|
+| [nvim-spectre](https://github.com/nvim-pack/nvim-spectre) | VS Code-like search and replace with live preview |
+
 ## Quality of Life
 
 | Plugin | Description |
