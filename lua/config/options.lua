@@ -2,6 +2,9 @@
 vim.g.mapleader = ";"
 vim.g.maplocalleader = ";"
 
+-- Use basedpyright for better Django ORM support
+vim.g.lazyvim_python_lsp = "basedpyright"
+
 require("config.keymaps")
 
 -- UI & behavior

@@ -28,6 +28,7 @@
 | Plugin | Description |
 |--------|-------------|
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter manager (see Formatters by Filetype below) |
+| [basedpyright](https://github.com/DetachHead/basedpyright) | Python LSP with Django ORM support (replaces pyright) |
 
 ### Formatters by Filetype
 
@@ -37,6 +38,10 @@
 | C# (.NET) | `csharpier` |
 | TypeScript, JavaScript, TSX, JSX | `prettier` |
 | HTML, CSS, JSON, YAML, Markdown | `prettier` |
+
+### Django ORM Setup
+
+See [DJANGO_SETUP.md](./DJANGO_SETUP.md) for complete guide on fixing Django `objects` attribute errors with basedpyright + django-stubs.
 
 ## Language Support
 
@@ -77,6 +82,7 @@
 
 | Tool | Purpose |
 |------|---------|
+| `basedpyright` | Python LSP with Django ORM support |
 | `csharpier` | C# code formatter |
 | `djlint` | Django template linter/formatter |
 | `eslint-lsp` | ESLint language server |

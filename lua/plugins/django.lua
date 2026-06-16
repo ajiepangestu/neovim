@@ -2,7 +2,7 @@ return {
 	-- Django tooling: djlint formatter, treesitter, djls LSP
 	{
 		"mason-org/mason.nvim",
-		opts = { ensure_installed = { "djlint" } },
+		opts = { ensure_installed = { "djlint", "basedpyright" } },
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -13,6 +13,17 @@ return {
 		opts = {
 			servers = {
 				djls = {},
+				basedpyright = {
+					settings = {
+						basedpyright = {
+							analysis = {
+								typeCheckingMode = "basic",
+								diagnosticMode = "openFilesOnly",
+								autoImportCompletions = true,
+							},
+						},
+					},
+				},
 			},
 		},
 	},
