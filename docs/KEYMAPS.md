@@ -14,12 +14,12 @@ Leader key: `;`
 
 ## Window Navigation
 
-| Key         | Mode | Action               |
-| ----------- | ---- | -------------------- |
-| `<leader>h` | n    | Move to left window  |
-| `<leader>j` | n    | Move to window below |
-| `<leader>k` | n    | Move to window above |
-| `<leader>l` | n    | Move to right window |
+| Key    | Mode | Action               |
+| ------ | ---- | -------------------- |
+| `<C-h>` | n    | Move to left window  |
+| `<C-j>` | n    | Move to window below |
+| `<C-k>` | n    | Move to window above |
+| `<C-l>` | n    | Move to right window |
 | `<leader>[` | n    | Split horizontal     |
 | `<leader>]` | n    | Split vertical       |
 
