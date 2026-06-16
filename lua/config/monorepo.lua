@@ -12,8 +12,28 @@ local function file_exists(path)
 	return false
 end
 
+local function read_file(path)
+	local f = io.open(path, "r")
+	if f then
+		local content = f:read("*all")
+		f:close()
+		return content
+	end
+	return nil
+end
+
 local function write_file(path, content)
 	local f = io.open(path, "w")
+	if f then
+		f:write(content)
+		f:close()
+		return true
+	end
+	return false
+end
+
+local function append_to_file(path, content)
+	local f = io.open(path, "a")
 	if f then
 		f:write(content)
 		f:close()
@@ -77,6 +97,24 @@ local function detect_django_folder(root_path)
 	return nil
 end
 
+local function check_pyproject_toml(api_path)
+	local pyproject_path = api_path .. "/pyproject.toml"
+	if not file_exists(pyproject_path) then
+		return nil
+	end
+
+	local content = read_file(pyproject_path)
+	if not content then
+		return nil
+	end
+
+	if content:match("%[tool%.pyright%]") or content:match("%[tool%.basedpyright%]") then
+		return "has_config"
+	else
+		return "exists_no_config"
+	end
+end
+
 local function create_pyright_config(api_path, settings_module)
 	local config = string.format([[{
   "venvPath": ".",
@@ -104,6 +142,34 @@ local function create_pyright_config(api_path, settings_module)
 
 	if write_file(path, config) then
 		vim.notify("Created " .. path, vim.log.levels.INFO)
+		return true
+	end
+	return false
+end
+
+local function add_to_pyproject_toml(api_path, settings_module)
+	local config = string.format([[
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportAttributeAccessIssue = "none"
+reportGeneralTypeIssues = "none"
+extraPaths = ["."]
+include = ["."]
+exclude = ["**/node_modules", "**/__pycache__", "**/.venv"]
+
+[tool.basedpyright.defineConstant]
+DJANGO_SETTINGS_MODULE = "%s"
+]], settings_module)
+
+	local path = api_path .. "/pyproject.toml"
+	if append_to_file(path, config) then
+		vim.notify("Added basedpyright config to " .. path, vim.log.levels.INFO)
 		return true
 	end
 	return false
@@ -187,9 +253,45 @@ local function setup_monorepo()
 			end
 
 			local created = 0
-			if create_pyright_config(final_api_path, settings_module) then
-				created = created + 1
+			local pyproject_status = check_pyproject_toml(final_api_path)
+
+			if pyproject_status == "has_config" then
+				vim.notify("pyproject.toml already has pyright config, skipping pyrightconfig.json", vim.log.levels.INFO)
+			elseif pyproject_status == "exists_no_config" then
+				vim.ui.select({ "Add to pyproject.toml", "Create pyrightconfig.json" }, {
+					prompt = "pyproject.toml exists. How to add basedpyright config?",
+				}, function(choice)
+					if choice == "Add to pyproject.toml" then
+						if add_to_pyproject_toml(final_api_path, settings_module) then
+							created = created + 1
+						end
+					else
+						if create_pyright_config(final_api_path, settings_module) then
+							created = created + 1
+						end
+					end
+
+					if create_editorconfig(cwd) then
+						created = created + 1
+					end
+
+					if created > 0 then
+						vim.notify(string.format("Created/updated %d config file(s)", created), vim.log.levels.INFO)
+						vim.notify("\nNext steps:", vim.log.levels.INFO)
+						vim.notify("1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate", vim.log.levels.INFO)
+						vim.notify("2. pip install django django-stubs[compatible-mypy] ruff", vim.log.levels.INFO)
+						vim.notify("3. Restart LSP: :LspRestart", vim.log.levels.INFO)
+					else
+						vim.notify("No files created (already exist?)", vim.log.levels.WARN)
+					end
+				end)
+				return
+			else
+				if create_pyright_config(final_api_path, settings_module) then
+					created = created + 1
+				end
 			end
+
 			if create_editorconfig(cwd) then
 				created = created + 1
 			end

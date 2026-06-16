@@ -11,7 +11,7 @@ root_project/
 │   └── src/
 ├── api/                    # Django backend
 │   ├── manage.py
-│   ├── pyrightconfig.json
+│   ├── pyproject.toml      # OR pyrightconfig.json
 │   ├── requirements.txt
 │   ├── .venv/
 │   └── myproject/
@@ -27,10 +27,63 @@ Use the Neovim command to auto-generate config files:
 :MonorepoSetup
 ```
 
-This will create:
-- `api/pyrightconfig.json` - Django type checking config
-- `.editorconfig` - Shared editor settings
-- Prompts to install Python dependencies
+This will:
+- Auto-detect Django folder (api/, backend/, server/, etc.)
+- Check for existing `pyproject.toml`
+- Create `pyrightconfig.json` OR add to `pyproject.toml`
+- Create `.editorconfig`
+- Prompt to install Python dependencies
+
+## pyproject.toml Support
+
+The setup command intelligently handles existing `pyproject.toml`:
+
+### Scenario 1: No pyproject.toml
+Creates `api/pyrightconfig.json` with basedpyright config.
+
+### Scenario 2: pyproject.toml exists WITH pyright config
+Skips creating config (uses existing).
+
+### Scenario 3: pyproject.toml exists WITHOUT pyright config
+Prompts you to choose:
+- **Add to pyproject.toml** - Appends `[tool.basedpyright]` section
+- **Create pyrightconfig.json** - Creates separate config file
+
+### Example: Adding to pyproject.toml
+
+If you choose to add to existing `pyproject.toml`, it appends:
+
+```toml
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportAttributeAccessIssue = "none"
+reportGeneralTypeIssues = "none"
+extraPaths = ["."]
+include = ["."]
+exclude = ["**/node_modules", "**/__pycache__", "**/.venv"]
+
+[tool.basedpyright.defineConstant]
+DJANGO_SETTINGS_MODULE = "myproject.settings"
+```
+
+### Which to Choose?
+
+**Use pyproject.toml if:**
+- ✅ You already use it for other tools (ruff, black, pytest, etc.)
+- ✅ You prefer single config file
+- ✅ Your team uses pyproject.toml
+
+**Use pyrightconfig.json if:**
+- ✅ You want pyright-specific config separate from other tools
+- ✅ You have complex pyright settings
+- ✅ You don't have pyproject.toml yet
+
+Both work identically for basedpyright.
 
 ## Manual Setup
 
