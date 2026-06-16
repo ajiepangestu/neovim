@@ -1,3 +1,4 @@
+-- Install lazy.nvim if not present
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -14,6 +15,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Setup lazy.nvim with LazyVim defaults
 require("lazy").setup({
 	spec = {
 		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
@@ -21,7 +23,7 @@ require("lazy").setup({
 	},
 	defaults = { lazy = false, version = false },
 	install = { colorscheme = { "monokai-pro", "habamax" } },
-	checker = { enabled = true, notify = false },
+	checker = { enabled = true, notify = false },  -- auto-check for plugin updates
 	performance = {
 		rtp = {
 			disabled_plugins = { "gzip", "tarPlugin", "tohtml", "tutor", "zipPlugin" },

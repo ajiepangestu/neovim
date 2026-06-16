@@ -1,4 +1,5 @@
 return {
+	-- Django tooling: djlint formatter, treesitter, djls LSP
 	{
 		"mason-org/mason.nvim",
 		opts = { ensure_installed = { "djlint" } },

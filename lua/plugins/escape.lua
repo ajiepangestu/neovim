@@ -1,4 +1,5 @@
 return {
+	-- Exit insert mode with jj
 	{
 		"max397574/better-escape.nvim",
 		event = "InsertEnter",

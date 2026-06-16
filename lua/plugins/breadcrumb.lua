@@ -1,4 +1,5 @@
 return {
+	-- nvim-navic: LSP-powered breadcrumb context
 	{
 		"SmiteshP/nvim-navic",
 		dependencies = { "neovim/nvim-lspconfig" },
@@ -27,6 +28,7 @@ return {
 			},
 		},
 	},
+	-- barbecue: winbar breadcrumb UI using navic
 	{
 		"utilyre/barbecue.nvim",
 		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },

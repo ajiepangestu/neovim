@@ -1,9 +1,12 @@
 return {
 	{ "akinsho/bufferline.nvim", enabled = false },
+	-- Lualine statusline with Monokai Pro orange theme
 	{
 		"nvim-lualine/lualine.nvim",
 		opts = function(_, opts)
 			local icons = LazyVim.config.icons
+
+			-- Monokai-inspired mode colors
 			local orange_theme = {
 				normal = {
 					a = { bg = "#ff9e64", fg = "#1a1a1a", gui = "bold" },

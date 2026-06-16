@@ -1,4 +1,5 @@
 return {
+	-- Python formatting with ruff via conform.nvim
 	{
 		"stevearc/conform.nvim",
 		optional = true,

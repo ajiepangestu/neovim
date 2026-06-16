@@ -1,4 +1,5 @@
 return {
+	-- Monokai Pro colorscheme with transparent backgrounds for select UI
 	{
 		"loctvl842/monokai-pro.nvim",
 		lazy = false,
@@ -12,5 +13,6 @@ return {
 			})
 		end,
 	},
+	-- Set default colorscheme for LazyVim
 	{ "LazyVim/LazyVim", opts = { colorscheme = "monokai-pro" } },
 }
