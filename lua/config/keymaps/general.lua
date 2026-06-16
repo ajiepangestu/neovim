@@ -56,12 +56,28 @@ end, { desc = "Close buffer" })
 
 -- Close all buffers, open explorer
 vim.keymap.set("n", "<leader>q", function()
+	local explorer_win = find_explorer_win()
+
+	-- Close all windows except explorer
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		if win ~= explorer_win then
+			pcall(vim.api.nvim_win_close, win, true)
+		end
+	end
+
+	-- Delete all file buffers
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if is_real_buffer(buf) then
 			pcall(vim.api.nvim_buf_delete, buf, { force = true })
 		end
 	end
-	open_explorer()
+
+	-- Focus or open explorer
+	if explorer_win and vim.api.nvim_win_is_valid(explorer_win) then
+		vim.api.nvim_set_current_win(explorer_win)
+	else
+		open_explorer()
+	end
 end, { desc = "Close all buffers" })
 
 vim.keymap.set({ "n", "i", "x", "s" }, "<leader>w", "<cmd>w<cr><esc>", { desc = "Save" })
