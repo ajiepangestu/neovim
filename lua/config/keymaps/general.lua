@@ -1,16 +1,30 @@
 -- Repeat f/t forward
 vim.keymap.set("n", ",,", "<Cmd>normal! ;<CR>", { desc = "Repeat f/t forward" })
 
--- Helper: open explorer and focus
+-- Helper: check if explorer is already open
+local function find_explorer_win()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype == "snacks_explorer" then
+			return win
+		end
+	end
+	return nil
+end
+
+-- Helper: open explorer and focus (prevents duplicates)
 local function open_explorer()
+	local explorer_win = find_explorer_win()
+	if explorer_win then
+		vim.api.nvim_set_current_win(explorer_win)
+		return
+	end
+
 	require("snacks").explorer()
 	vim.defer_fn(function()
-		for _, win in ipairs(vim.api.nvim_list_wins()) do
-			local buf = vim.api.nvim_win_get_buf(win)
-			if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype == "snacks_explorer" then
-				vim.api.nvim_set_current_win(win)
-				return
-			end
+		local win = find_explorer_win()
+		if win then
+			vim.api.nvim_set_current_win(win)
 		end
 	end, 50)
 end
