@@ -158,7 +158,28 @@ trim_trailing_whitespace = false
 
 ## Python Dependencies
 
-Install in `api/` folder:
+Install in `api/` folder using the safe installer:
+
+```bash
+cd api
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Then in Neovim:
+```vim
+:DjangoInstall
+```
+
+This command:
+- ✅ Checks if virtualenv is active
+- ✅ Prevents installing packages globally
+- ✅ Installs django, django-stubs, and ruff safely
+- ✅ Shows clear error if venv not activated
+
+### Manual Installation (Alternative)
+
+If you prefer manual installation:
 
 ```bash
 cd api
@@ -167,6 +188,18 @@ source .venv/bin/activate
 pip install django django-stubs[compatible-mypy] ruff
 pip install -r requirements.txt
 ```
+
+### Check Virtualenv Status
+
+Use this command to verify venv is active:
+
+```vim
+:VenvStatus
+```
+
+Output:
+- ✅ `Virtualenv active: /path/to/api/.venv` - Safe to install
+- ⚠️ `No virtualenv active` - Activate venv first!
 
 ## How It Works
 

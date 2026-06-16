@@ -16,6 +16,8 @@
 | Command | Description |
 |---------|-------------|
 | `:MonorepoSetup` | Auto-generate config files for monorepo (Django + Next.js) |
+| `:DjangoInstall` | Install Django dependencies with virtualenv safety checks |
+| `:VenvStatus` | Check if virtualenv is currently active |
 
 ## LSP Commands (Neovim Built-in)
 
