@@ -8,6 +8,7 @@ vim.g.lazyvim_python_lsp = "basedpyright"
 require("config.keymaps")
 require("config.monorepo")
 require("config.django")
+require("config.workspace")
 
 -- UI & behavior
 vim.opt.showtabline = 0          -- hide tabline
