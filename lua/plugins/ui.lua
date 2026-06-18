@@ -116,7 +116,18 @@ return {
 					{ "progress", separator = " ", padding = { left = 1, right = 0 } },
 					{ "location", padding = { left = 0, right = 1 } },
 				},
-				lualine_z = { function() return " " .. os.date("%R") end },
+				lualine_z = {
+				{
+					function()
+						local ok, opencode = pcall(require, "opencode")
+						if ok then return opencode.statusline() end
+						return ""
+					end,
+					cond = function() return package.loaded["opencode"] end,
+					color = function() return { fg = Snacks.util.color("String") } end,
+				},
+				function() return " " .. os.date("%R") end,
+			}
 			}
 
 			opts.extensions = { "neo-tree", "lazy", "fzf" }
