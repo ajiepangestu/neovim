@@ -52,10 +52,10 @@ sudo apt install xclip
 
 ### Prefix Key
 
-Prefix diubah dari `Ctrl+b` menjadi `Ctrl+a` untuk akses yang lebih mudah.
+Prefix menggunakan `Ctrl+b` (default) untuk menghindari konflik dengan increment Neovim (`Ctrl+a`).
 
 ```
-Prefix: Ctrl+a
+Prefix: Ctrl+b
 ```
 
 ### Pengaturan Umum
@@ -102,14 +102,37 @@ Prefix: Ctrl+a
 | `Prefix + k` | Pindah ke pane atas |
 | `Prefix + l` | Pindah ke pane kanan |
 
-#### Resize Pane (Vim-style)
+#### Switch / Swap Pane
 
 | Shortcut | Fungsi |
 |----------|--------|
-| `Prefix + H` | Resize pane ke kiri (5 unit) |
-| `Prefix + J` | Resize pane ke bawah (5 unit) |
-| `Prefix + K` | Resize pane ke atas (5 unit) |
-| `Prefix + L` | Resize pane ke kanan (5 unit) |
+| `Prefix + {` | Tukar posisi dengan pane sebelumnya |
+| `Prefix + }` | Tukar posisi dengan pane berikutnya |
+| `Prefix + o` | Rotate semua pane dalam window |
+
+Semua repeatable (bisa ditekan berulang tanpa mengulang prefix).
+
+#### Toggle Show Active Pane
+
+| Shortcut | Fungsi |
+|----------|--------|
+| `Prefix + Space` | Tampilkan nomor/indikator pane (aktif disorot ungu) |
+| `Prefix + z` | Toggle zoom (fullscreen) pane aktif |
+
+Indikator pane tampil selama 2 detik (`display-panes-time 2000`), pane aktif berwarna `#ab9df2` dan pane lain `#727072`.
+
+#### Resize Pane — Height & Width (Vim-style, repeatable)
+
+| Shortcut | Fungsi |
+|----------|--------|
+| `Prefix + H` | Resize width ke kiri (5 unit) |
+| `Prefix + J` | Resize height ke bawah (5 unit) |
+| `Prefix + K` | Resize height ke atas (5 unit) |
+| `Prefix + L` | Resize width ke kanan (5 unit) |
+| `Prefix + ←/↓/↑/→` | Resize halus (2 unit) |
+| `Prefix + Shift+←/↓/↑/→` | Resize besar (10 unit) |
+| `Prefix + =` | Ratakan pane horizontal |
+| `Prefix + +` | Ratakan pane vertical |
 
 ### Session Management
 
