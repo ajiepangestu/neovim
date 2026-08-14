@@ -47,7 +47,18 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
-		dependencies = { "mason-org/mason.nvim" },
+		-- blink.cmp is a dependency so its completion capabilities are available
+		-- when the servers are configured below; blink does not register them
+		-- itself. The gain is small and worth stating honestly: Neovim 0.12
+		-- already advertises snippetSupport, insertReplaceSupport,
+		-- labelDetailsSupport and resolveSupport for additionalTextEdits by
+		-- default. All blink adds is `detail` and `data` to resolveSupport, which
+		-- lets a server defer the signature shown in the menu to a resolve call
+		-- instead of sending it for every item -- it matters for lists like the
+		-- ~1000 items vtsls returns at a bare cursor. Measured: no difference in
+		-- gopls/vtsls/html/cssls responses, and buffer-open time is unchanged
+		-- within noise even though this makes blink load at BufReadPre.
+		dependencies = { "mason-org/mason.nvim", "saghen/blink.cmp" },
 		-- lazy resolves these as literal dotted paths -- `*` is NOT a wildcard, it
 		-- would look for a key actually named "*". List each server explicitly.
 		opts_extend = { "servers.vtsls.keys", "servers.eslint.keys" },
@@ -252,9 +263,15 @@ return {
 				end,
 			})
 
-			if opts.servers["*"] then
-				vim.lsp.config("*", opts.servers["*"])
+			-- Completion capabilities apply to every server, so they belong on the
+			-- "*" config rather than being repeated per server.
+			local star = vim.deepcopy(opts.servers["*"] or {})
+			local has_blink, blink = pcall(require, "blink.cmp")
+			if has_blink then
+				star.capabilities =
+					vim.tbl_deep_extend("force", blink.get_lsp_capabilities({}, true), star.capabilities or {})
 			end
+			vim.lsp.config("*", star)
 
 			local enable = {}
 			for server, sopts in pairs(opts.servers) do
