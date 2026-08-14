@@ -14,6 +14,8 @@ return {
 				"lua-language-server",
 				"vtsls",
 				"tailwindcss-language-server",
+				"html-lsp",
+				"css-lsp",
 				"omnisharp",
 				"fsautocomplete",
 				-- tools
@@ -46,7 +48,9 @@ return {
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = { "mason-org/mason.nvim" },
-		opts_extend = { "servers.*.keys" },
+		-- lazy resolves these as literal dotted paths -- `*` is NOT a wildcard, it
+		-- would look for a key actually named "*". List each server explicitly.
+		opts_extend = { "servers.vtsls.keys", "servers.eslint.keys" },
 		opts = {
 			---@type vim.diagnostic.Opts
 			diagnostics = {
@@ -147,6 +151,20 @@ return {
 						},
 					},
 				},
+
+				-- Tag/attribute completion, hover docs and validation for html.
+				-- Complements emmet (which only expands abbreviations) and
+				-- tailwindcss (which only knows class names).
+				html = {},
+
+				-- Property completion, value hints and colour swatches for css.
+				cssls = {
+					settings = {
+						css = { lint = { unknownAtRules = "ignore" } },
+						scss = { lint = { unknownAtRules = "ignore" } },
+						less = { lint = { unknownAtRules = "ignore" } },
+					},
+				},
 				-- .NET
 				omnisharp = {
 					handlers = {
@@ -244,10 +262,26 @@ return {
 					sopts = sopts == true and {} or sopts
 					local setup = opts.setup[server]
 					if not (setup and setup(server, sopts)) then
-						-- `keys` is ours, not part of vim.lsp.Config
+						-- `filetypes_extra` appends to whatever lspconfig ships,
+						-- instead of replacing it like `filetypes` would. It is a
+						-- SET, not a list, on purpose: lazy merges maps key by key
+						-- but replaces lists wholesale, so a set lets several plugin
+						-- files each add filetypes to the same server without
+						-- clobbering one another. Sorted so the result is stable.
+						if sopts.filetypes_extra then
+							local extra = {}
+							for ft in pairs(sopts.filetypes_extra) do
+								extra[#extra + 1] = ft
+							end
+							table.sort(extra)
+							local defaults = vim.lsp.config[server] or {}
+							sopts.filetypes = vim.list_extend(vim.deepcopy(defaults.filetypes or {}), extra)
+						end
+
+						-- `keys` and `filetypes_extra` are ours, not vim.lsp.Config
 						local cfg = {}
 						for k, v in pairs(sopts) do
-							if k ~= "keys" then
+							if k ~= "keys" and k ~= "filetypes_extra" then
 								cfg[k] = v
 							end
 						end

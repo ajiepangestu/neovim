@@ -110,9 +110,49 @@ Neovim's built-in `vim.lsp.enable`. Mason installs the binaries.
 | `eslint` | ESLint |
 | `emmet_language_server` | Emmet abbreviations |
 | `tailwindcss` | Tailwind CSS |
+| `html` | HTML tags, attributes, validation |
+| `cssls` | CSS / SCSS / LESS properties and colours |
 | `gopls` | Go (Fiber) |
 | `omnisharp` | C# / .NET |
 | `fsautocomplete` | F# |
+
+### Which server answers in a markup buffer
+
+Four servers cover markup and they do different jobs, so several attach at once.
+
+| Filetype | Servers attached | Each contributes |
+|----------|------------------|------------------|
+| `html` | `html`, `emmet_language_server`, `tailwindcss` (+ `djls` in a Django project) | tags/attributes, abbreviation expansion, class names |
+| `htmldjango` | `html`, `djls`, `emmet_language_server`, `tailwindcss` | as above, plus `{% %}` / `{{ }}` from djls |
+| `gohtmltmpl` | `html`, `gopls`, `emmet_language_server`, `tailwindcss` | as above, plus `{{ }}` action diagnostics from gopls |
+| `css` / `scss` | `cssls`, `emmet_language_server`, `tailwindcss` | properties and colours, abbreviations, class names |
+| `typescriptreact` | `vtsls`, `emmet_language_server`, `tailwindcss` (+ `eslint` when the project has a config) | types, abbreviations, class names |
+
+`cssls` is configured with `lint.unknownAtRules = "ignore"` for css, scss and
+less. Without it every `@tailwind` and `@apply` directive is reported as an
+error. Real mistakes are still caught — a `colr: red` typo still reports
+`Unknown property`.
+
+The `html` server ships with `filetypes = { "html" }` only. `htmldjango` and
+`gohtmltmpl` are added through `filetypes_extra` (see below), because Django and
+Go templates are html with a template syntax layered on top — verified to
+produce no false diagnostics on `{% if %}` or `{{ }}` inside attributes.
+
+### `filetypes_extra`
+
+A server spec may set `filetypes_extra`, a **set** of filetypes to append to
+whatever lspconfig ships, rather than replacing the list like `filetypes` would:
+
+```lua
+html = { filetypes_extra = { htmldjango = true } }   -- in django.lua
+html = { filetypes_extra = { gohtmltmpl = true } }   -- in go.lua
+```
+
+It is a set and not a list on purpose. lazy.nvim merges maps key by key but
+replaces lists wholesale, so two plugin files each adding a list to the same
+server would silently lose one of them. `opts_extend` does not help here: its
+dotted paths are literal, so `servers.*.keys` looks for a key actually named
+`*` and never matches.
 
 Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_FIBER.md).
 
@@ -131,6 +171,9 @@ Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua` and
 | `vtsls` | TypeScript / JavaScript LSP |
 | `eslint-lsp` | ESLint language server |
 | `tailwindcss-language-server` | Tailwind CSS LSP |
+| `html-lsp` | HTML LSP (`vscode-html-language-server`) |
+| `css-lsp` | CSS LSP (`vscode-css-language-server`) |
+| `emmet-language-server` | Emmet abbreviations |
 | `gofumpt`, `goimports` | Go formatters |
 | `omnisharp` / `fsautocomplete` | C# / F# LSP |
 | `prettier` | Prettier formatter |
@@ -140,7 +183,11 @@ Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua` and
 ## Treesitter Parsers
 
 Installed automatically on first start, see `ensure_installed` in
-`lua/plugins/treesitter.lua` plus the per-stack files: bash, c, c_sharp, css,
-diff, fsharp, go, gomod, gosum, gotmpl, gowork, html, htmldjango, ini,
+`lua/plugins/treesitter.lua` plus the per-stack files — 33 in total: bash, c,
+c_sharp, css, diff, fsharp, go, gomod, gosum, gotmpl, gowork, html, htmldjango,
 javascript, jsdoc, json, lua, luadoc, luap, markdown, markdown_inline, printf,
 python, query, regex, scss, toml, tsx, typescript, vim, vimdoc, xml, yaml.
+
+`dtd` also appears in `:checkhealth vim.treesitter`; it is pulled in as a
+dependency of the xml parser rather than requested here. There is no `jsonc`
+parser — jsonc files are highlighted by the `json` one.

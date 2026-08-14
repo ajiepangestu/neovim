@@ -60,22 +60,17 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		opts = {
-			-- Emmet in Go templates too (see plugins/nextjs.lua for the server itself)
-			setup = {
-				emmet_language_server = function(_, sopts)
-					local defaults = vim.lsp.config.emmet_language_server or {}
-					sopts.filetypes = vim.list_extend(vim.deepcopy(defaults.filetypes or {}), { "gohtmltmpl" })
-				end,
-				-- lspconfig lists `gotmpl`, but nothing produces that filetype here:
-				-- .gohtml/.gotmpl/.tmpl are mapped to `gohtmltmpl` above so treesitter
-				-- and emmet work. Without this, gopls never attaches to templates.
-				gopls = function(_, sopts)
-					local defaults = vim.lsp.config.gopls or {}
-					sopts.filetypes = vim.list_extend(vim.deepcopy(defaults.filetypes or {}), { "gohtmltmpl" })
-				end,
-			},
 			servers = {
+				-- Emmet in Go templates too (see plugins/nextjs.lua for the server)
+				emmet_language_server = { filetypes_extra = { gohtmltmpl = true } },
+				-- Tag and attribute completion in Go templates. gopls only checks
+				-- the `{{ ... }}` actions; the surrounding markup is plain html.
+				html = { filetypes_extra = { gohtmltmpl = true } },
 				gopls = {
+					-- lspconfig lists `gotmpl`, but nothing produces that filetype
+					-- here: .gohtml/.gotmpl/.tmpl map to `gohtmltmpl` above so
+					-- treesitter and emmet work. Without this gopls never attaches.
+					filetypes_extra = { gohtmltmpl = true },
 					cmd = gopls_cmd(),
 					settings = {
 						gopls = {

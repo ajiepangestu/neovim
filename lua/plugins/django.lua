@@ -8,6 +8,10 @@ return {
 		"neovim/nvim-lspconfig",
 		opts = {
 			servers = {
+				-- Tag and attribute completion in Django templates. djls handles the
+				-- `{% %}` / `{{ }}` side, not the surrounding markup.
+				html = { filetypes_extra = { htmldjango = true } },
+
 				-- djls also claims plain `html`, so pin it to real Django projects.
 				-- Without this it attaches to any html file (e.g. Go templates).
 				djls = {
