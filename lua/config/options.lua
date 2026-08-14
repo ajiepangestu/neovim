@@ -5,6 +5,20 @@ vim.g.maplocalleader = ";"
 -- Format on save (toggle with <leader>uf / <leader>uF)
 vim.g.autoformat = true
 
+-- Remote-plugin providers, all unused here: they only exist to run Neovim
+-- plugins whose own source is written in Python/Node/Perl/Ruby, and no plugin
+-- in this config ships an rplugin/ directory. They are NOT involved in editing
+-- those languages -- basedpyright, vtsls and gopls are separate processes
+-- spoken to over LSP, so Django, Next.js and Go are unaffected.
+-- Turning them off keeps :checkhealth free of errors about a missing pynvim.
+-- It does not measurably change startup time (the interpreters are probed
+-- lazily on first use, not during startup) -- this is purely about not
+-- carrying four dependencies the config never calls.
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 local opt = vim.opt
 
 -- General
