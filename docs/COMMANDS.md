@@ -5,6 +5,11 @@
 | Command | Description |
 |---------|-------------|
 | `:Lazy` | Open lazy.nvim plugin manager UI |
+| `:Mason` | Open Mason UI (LSP servers and formatters) |
+| `:ConformInfo` | Show the formatters conform will run for this buffer |
+| `:TSUpdate` | Update treesitter parsers |
+| `:VenvSelect` | Pick the Python virtualenv for the LSP |
+| `:Trouble diagnostics toggle` | Toggle the diagnostics list |
 | `:LazyGit` | Open LazyGit in floating terminal |
 | `:LazyGitConfig` | Open LazyGit config |
 | `:LazyGitCurrentFile` | Open LazyGit focused on current file |
@@ -18,6 +23,22 @@
 | `:MonorepoSetup` | Auto-generate config files for monorepo (Django + Next.js) |
 | `:DjangoInstall` | Install Django dependencies with virtualenv safety checks |
 | `:VenvStatus` | Check if virtualenv is currently active |
+
+## Workspaces
+
+Multi-root workspaces defined in `lua/config/workspace.lua`. Every command that
+takes a name will prompt for one interactively if it is omitted. See the
+`<leader>w*` keymaps in `docs/KEYMAPS.md`.
+
+| Command | Description |
+|---------|-------------|
+| `:WorkspaceSave [name]` | Save the current set of folders as a workspace |
+| `:WorkspaceLoad [name]` | Load a saved workspace |
+| `:WorkspaceList` | List all saved workspaces |
+| `:WorkspaceCurrent` | Show the name of the active workspace |
+| `:WorkspaceAdd [path]` | Add a folder to the current workspace |
+| `:WorkspaceRemove` | Remove a folder from the current workspace |
+| `:WorkspaceDelete [name]` | Delete a saved workspace |
 
 ## LSP Commands (Neovim Built-in)
 
@@ -58,5 +79,5 @@
 
 | Command | Description |
 |---------|-------------|
-| `:lua LazyVim.format({ force = true })` | Force format current buffer |
+| `:lua require('config.util').format()` | Force format current buffer |
 | `:lua vim.lsp.buf.format({ async = true })` | Async LSP format |

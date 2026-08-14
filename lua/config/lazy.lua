@@ -15,15 +15,14 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Setup lazy.nvim with LazyVim defaults
 require("lazy").setup({
 	spec = {
-		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
 		{ import = "plugins" },
 	},
 	defaults = { lazy = false, version = false },
 	install = { colorscheme = { "monokai-pro", "habamax" } },
-	checker = { enabled = true, notify = false },  -- auto-check for plugin updates
+	checker = { enabled = true, notify = false }, -- auto-check for plugin updates
+	change_detection = { notify = false },
 	performance = {
 		rtp = {
 			disabled_plugins = { "gzip", "tarPlugin", "tohtml", "tutor", "zipPlugin" },

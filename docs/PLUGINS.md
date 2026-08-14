@@ -4,8 +4,9 @@
 
 | Plugin | Description |
 |--------|-------------|
-| [LazyVim](https://github.com/LazyVim/LazyVim) | Neovim distribution base |
 | [lazy.nvim](https://github.com/folke/lazy.nvim) | Plugin manager |
+| [snacks.nvim](https://github.com/folke/snacks.nvim) | Picker, explorer, terminal, notifier, dashboard, statuscolumn |
+| [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) | Lua utility library |
 
 ## UI
 
@@ -15,13 +16,7 @@
 | [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) | Statusline with orange Monokai theme |
 | [barbecue.nvim](https://github.com/utilyre/barbecue.nvim) | Winbar breadcrumb (LSP context) |
 | [nvim-navic](https://github.com/SmiteshP/nvim-navic) | LSP document symbol provider for breadcrumbs |
-| [bufferline.nvim](https://github.com/akinsho/bufferline.nvim) | Disabled |
-
-## AI / Completion
-
-| Plugin | Description |
-|--------|-------------|
-| [copilot.lua](https://github.com/zbirenbaum/copilot.lua) | GitHub Copilot with custom keymaps |
+| [noice.nvim](https://github.com/folke/noice.nvim) | Cmdline / message UI |
 
 ## LSP / Formatting / Linting
 
@@ -34,7 +29,9 @@
 
 | Filetype | Formatter |
 |----------|-----------|
-| Python, Django | `ruff` |
+| Python | `ruff_fix` + `ruff_format` |
+| Django templates | `djlint --profile django` |
+| Go | `goimports` + `gofumpt` |
 | C# (.NET) | `csharpier` |
 | TypeScript, JavaScript, TSX, JSX | `prettier` |
 | HTML, CSS, JSON, YAML, Markdown | `prettier` |
@@ -53,13 +50,13 @@ Use `:MonorepoSetup` command to auto-generate config files.
 
 | Plugin | Description |
 |--------|-------------|
-| [nvim-emmet](https://github.com/olrtg/nvim-emmet) | Emmet expansion for HTML/JSX/TSX |
+| [nvim-emmet](https://github.com/olrtg/nvim-emmet) | Wrap selection with an emmet abbreviation (needs `emmet_language_server`) |
 
 ## Git
 
 | Plugin | Description |
 |--------|-------------|
-| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column (LazyVim default) |
+| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column, hunk staging |
 | [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) | LazyGit integration |
 | [git-blame.nvim](https://github.com/f-person/git-blame.nvim) | Inline git blame (like GitLens) |
 | [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Enhanced diff viewer for git changes |
@@ -76,32 +73,74 @@ Use `:MonorepoSetup` command to auto-generate config files.
 |--------|-------------|
 | [better-escape.nvim](https://github.com/max397574/better-escape.nvim) | Exit insert mode with `jj` |
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets/parentheses |
-| [editorconfig.nvim](https://github.com/gpanders/editorconfig.nvim) | EditorConfig support |
-| [spellsitter.nvim](https://github.com/lewis6991/spellsitter.nvim) | Spell checking with treesitter |
 
-## LazyVim Extras (via lazyvim.json)
+## Editor
 
-| Extra | Description |
-|-------|-------------|
-| `ai.copilot` | Copilot integration base |
-| `lang.python` | Python LSP, treesitter, debugger |
-| `lang.typescript` | TypeScript/JavaScript LSP and tools |
-| `lang.dotnet` | C# / .NET LSP (OmniSharp) |
-| `lang.tailwind` | Tailwind CSS LSP |
-| `formatting.prettier` | Prettier formatter for JS/TS/HTML/CSS |
+| Plugin | Description |
+|--------|-------------|
+| [blink.cmp](https://github.com/saghen/blink.cmp) | Completion engine (LSP, snippets, path, buffer) |
+| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Parsers, highlighting, indent, folds (`main` branch) |
+| [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP server defaults, wired up with `vim.lsp.config`/`enable` |
+| [mason.nvim](https://github.com/mason-org/mason.nvim) | Installs LSP servers and formatters |
+| [flash.nvim](https://github.com/folke/flash.nvim) | Jump anywhere on screen with `s` |
+| [which-key.nvim](https://github.com/folke/which-key.nvim) | Keybinding hints |
+| [trouble.nvim](https://github.com/folke/trouble.nvim) | Diagnostics / references / symbols list |
+| [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | Highlight and search TODO/FIXME comments |
+| [mini.ai](https://github.com/nvim-mini/mini.ai) | Extra `a`/`i` text objects |
+| [mini.pairs](https://github.com/nvim-mini/mini.pairs) | Auto pairs |
+| [mini.icons](https://github.com/nvim-mini/mini.icons) | File type icons |
+| [ts-comments.nvim](https://github.com/folke/ts-comments.nvim) | Language aware `gc` commenting |
+| [noice.nvim](https://github.com/folke/noice.nvim) | Cmdline, messages and popupmenu UI |
+| [persistence.nvim](https://github.com/folke/persistence.nvim) | Session save/restore |
+| [lazydev.nvim](https://github.com/folke/lazydev.nvim) | Lua LSP support for editing this config |
+| [venv-selector.nvim](https://github.com/linux-cultist/venv-selector.nvim) | Pick the Python virtualenv (`<leader>cv`) |
+
+## Language Servers
+
+Configured in `lua/plugins/lsp.lua` (plus `django.lua` / `nextjs.lua`) and enabled with
+Neovim's built-in `vim.lsp.enable`. Mason installs the binaries.
+
+| Server | Language |
+|--------|----------|
+| `lua_ls` | Lua |
+| `basedpyright` | Python (Django ORM aware) |
+| `ruff` | Python lint / fix |
+| `djls` | Django templates |
+| `vtsls` | TypeScript / JavaScript |
+| `eslint` | ESLint |
+| `emmet_language_server` | Emmet abbreviations |
+| `tailwindcss` | Tailwind CSS |
+| `gopls` | Go (Fiber) |
+| `omnisharp` | C# / .NET |
+| `fsautocomplete` | F# |
+
+Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_FIBER.md).
 
 ## Mason Installed Tools
 
+Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua` and
+`nextjs.lua`, installed on first start.
+
 | Tool | Purpose |
 |------|---------|
+| `lua-language-server` | Lua LSP |
 | `basedpyright` | Python LSP with Django ORM support |
-| `csharpier` | C# code formatter |
+| `ruff` | Python linter / formatter |
+| `django-language-server` | Django template LSP (`djls`) |
 | `djlint` | Django template linter/formatter |
+| `vtsls` | TypeScript / JavaScript LSP |
 | `eslint-lsp` | ESLint language server |
-| `prettierd` | Prettier daemon formatter |
+| `tailwindcss-language-server` | Tailwind CSS LSP |
+| `gofumpt`, `goimports` | Go formatters |
+| `omnisharp` / `fsautocomplete` | C# / F# LSP |
+| `prettier` | Prettier formatter |
+| `csharpier`, `fantomas` | C# / F# formatters |
+| `stylua`, `shfmt` | Lua and shell formatters |
 
-## Treesitter Parsers (Extra)
+## Treesitter Parsers
 
-| Parser | Language |
-|--------|----------|
-| `django` | Django templates |
+Installed automatically on first start, see `ensure_installed` in
+`lua/plugins/treesitter.lua` plus the per-stack files: bash, c, c_sharp, css,
+diff, fsharp, go, gomod, gosum, gotmpl, gowork, html, htmldjango, ini,
+javascript, jsdoc, json, lua, luadoc, luap, markdown, markdown_inline, printf,
+python, query, regex, scss, toml, tsx, typescript, vim, vimdoc, xml, yaml.

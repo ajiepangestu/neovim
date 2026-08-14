@@ -205,7 +205,7 @@ Output:
 
 ### LSP Auto-Detection
 
-Neovim (LazyVim) automatically detects project roots:
+Neovim automatically detects project roots (see `lua/config/util.lua`):
 
 | File | LSP Activated |
 |------|---------------|
