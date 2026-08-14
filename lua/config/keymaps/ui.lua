@@ -18,11 +18,11 @@ vim.keymap.set({ "n", "t" }, "<leader>t", function()
 	Snacks.terminal.toggle(nil, { cwd = Util.root() })
 end, { desc = "Toggle terminal" })
 
-vim.keymap.set({ "n", "t" }, "<leader>th", function()
+vim.keymap.set({ "n", "t" }, "<leader>Th", function()
 	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "bottom" } })
 end, { desc = "Terminal split horizontal" })
 
-vim.keymap.set({ "n", "t" }, "<leader>tv", function()
+vim.keymap.set({ "n", "t" }, "<leader>Tv", function()
 	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "right" } })
 end, { desc = "Terminal split vertical" })
 

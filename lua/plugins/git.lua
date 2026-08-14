@@ -24,7 +24,7 @@ return {
 		cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
 		keys = {
 			{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open diff view" },
-			{ "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "File history" },
+			{ "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "File history" },
 		},
 		opts = {
 			view = {

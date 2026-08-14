@@ -19,7 +19,7 @@ lua/config/
     ui.lua                   plugin UIs, explorer, terminals, <leader>u* toggles
   monorepo.lua               :MonorepoSetup
   django.lua                 :DjangoInstall, :VenvStatus
-  workspace.lua              :Workspace* commands and <leader>w* maps
+  workspace.lua              :Workspace* commands and <leader>W* maps
 lua/plugins/                 one file per context, each returns a lazy.nvim spec
   snacks.lua                 picker, explorer, terminal, dashboard, notifier + picker keymaps
   lsp.lua                    mason, nvim-lspconfig, server configs, diagnostics

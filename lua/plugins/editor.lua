@@ -35,10 +35,15 @@ return {
 					{ "<leader>o", group = "opencode" },
 					{ "<leader>p", group = "plugins" },
 					{ "<leader>s", group = "search" },
-					{ "<leader>t", group = "terminal" },
 					{ "<leader>u", group = "ui" },
-					{ "<leader>w", group = "workspace" },
 					{ "<leader>x", group = "diagnostics/quickfix" },
+					-- Groups live on the capital so the lowercase key stays a plain
+					-- mapping: ;w saves, ;q closes buffers, ;t toggles the terminal.
+					-- A key that is both a mapping and a prefix waits 'timeoutlen'.
+					{ "<leader>Q", group = "quit/session" },
+					{ "<leader>T", group = "terminal" },
+					{ "<leader>W", group = "workspace" },
+					{ "<leader>gh", group = "hunk" },
 					{ "[", group = "prev" },
 					{ "]", group = "next" },
 					{ "g", group = "goto" },
@@ -183,10 +188,10 @@ return {
 		opts = {},
 		-- stylua: ignore
 		keys = {
-			{ "<leader>qs", function() require("persistence").load() end, desc = "Restore session" },
-			{ "<leader>qS", function() require("persistence").select() end, desc = "Select session" },
-			{ "<leader>ql", function() require("persistence").load({ last = true }) end, desc = "Restore last session" },
-			{ "<leader>qd", function() require("persistence").stop() end, desc = "Don't save current session" },
+			{ "<leader>Qs", function() require("persistence").load() end, desc = "Restore session" },
+			{ "<leader>QS", function() require("persistence").select() end, desc = "Select session" },
+			{ "<leader>Ql", function() require("persistence").load({ last = true }) end, desc = "Restore last session" },
+			{ "<leader>Qd", function() require("persistence").stop() end, desc = "Don't save current session" },
 		},
 	},
 }

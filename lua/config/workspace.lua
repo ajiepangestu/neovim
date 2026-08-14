@@ -356,27 +356,27 @@ vim.api.nvim_create_user_command("WorkspaceCurrent", function()
 	M.current()
 end, { desc = "Show current workspace name" })
 
-vim.keymap.set("n", "<leader>ws", function()
+vim.keymap.set("n", "<leader>Ws", function()
 	M.save()
 end, { desc = "Save workspace" })
 
-vim.keymap.set("n", "<leader>wo", function()
+vim.keymap.set("n", "<leader>Wo", function()
 	M.list()
 end, { desc = "Open workspace" })
 
-vim.keymap.set("n", "<leader>wa", function()
+vim.keymap.set("n", "<leader>Wa", function()
 	M.add_folder()
 end, { desc = "Add folder to workspace" })
 
-vim.keymap.set("n", "<leader>wr", function()
+vim.keymap.set("n", "<leader>Wr", function()
 	M.remove_folder()
 end, { desc = "Remove folder from workspace" })
 
-vim.keymap.set("n", "<leader>wd", function()
+vim.keymap.set("n", "<leader>Wd", function()
 	M.delete()
 end, { desc = "Delete workspace" })
 
-vim.keymap.set("n", "<leader>wc", function()
+vim.keymap.set("n", "<leader>Wc", function()
 	M.current()
 end, { desc = "Show current workspace" })
 

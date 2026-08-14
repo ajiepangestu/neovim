@@ -28,7 +28,7 @@
 
 Multi-root workspaces defined in `lua/config/workspace.lua`. Every command that
 takes a name will prompt for one interactively if it is omitted. See the
-`<leader>w*` keymaps in `docs/KEYMAPS.md`.
+`<leader>W*` keymaps in `docs/KEYMAPS.md`.
 
 | Command | Description |
 |---------|-------------|

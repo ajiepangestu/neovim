@@ -9,7 +9,7 @@ Leader key: `;`
 | `,,`        | n          | Repeat f/t forward                                    |
 | `<leader>d` | n          | Close current buffer (opens explorer if none left)    |
 | `<leader>q` | n          | Close all buffers and open explorer (never quits nvim)|
-| `<leader>qq`| n          | Quit all                                              |
+| `<leader>Qq`| n          | Quit all                                              |
 | `<leader>w` | n, x, s    | Save (not insert mode — see Known Keymap Conflicts)   |
 | `<C-s>`     | n, i, x, s | Save (works in insert mode too)                       |
 | `<C-S-f>`   | n, x       | Format buffer                                         |
@@ -46,22 +46,22 @@ Multi-root workspaces, saved to disk. See `lua/config/workspace.lua` and the
 
 | Key          | Mode | Action                       |
 | ------------ | ---- | ---------------------------- |
-| `<leader>ws` | n    | Save workspace               |
-| `<leader>wo` | n    | Open workspace               |
-| `<leader>wa` | n    | Add folder to workspace      |
-| `<leader>wr` | n    | Remove folder from workspace |
-| `<leader>wd` | n    | Delete workspace             |
-| `<leader>wc` | n    | Show current workspace       |
+| `<leader>Ws` | n    | Save workspace               |
+| `<leader>Wo` | n    | Open workspace               |
+| `<leader>Wa` | n    | Add folder to workspace      |
+| `<leader>Wr` | n    | Remove folder from workspace |
+| `<leader>Wd` | n    | Delete workspace             |
+| `<leader>Wc` | n    | Show current workspace       |
 
 ## Sessions (persistence.nvim)
 
 | Key          | Mode | Action                        |
 | ------------ | ---- | ----------------------------- |
-| `<leader>qs` | n    | Restore session               |
-| `<leader>ql` | n    | Restore last session          |
-| `<leader>qS` | n    | Select session                |
-| `<leader>qd` | n    | Don't save the current session|
-| `<leader>qq` | n    | Quit all                      |
+| `<leader>Qs` | n    | Restore session               |
+| `<leader>Ql` | n    | Restore last session          |
+| `<leader>QS` | n    | Select session                |
+| `<leader>Qd` | n    | Don't save the current session|
+| `<leader>Qq` | n    | Quit all                      |
 
 ## Window Navigation
 
@@ -208,8 +208,8 @@ straight there, several results open a list with a preview (like VS Code).
 | `<leader>pm` | n    | Open Mason UI             |
 | `<leader>e`  | n    | Toggle file explorer      |
 | `<leader>t`  | n, t | Toggle terminal           |
-| `<leader>th` | n, t | Terminal split horizontal |
-| `<leader>tv` | n, t | Terminal split vertical   |
+| `<leader>Th` | n, t | Terminal split horizontal |
+| `<leader>Tv` | n, t | Terminal split vertical   |
 | `<leader>gg` | n    | Open LazyGit              |
 | `<leader>?`  | n    | Buffer keymaps (which-key)|
 | `<leader>K`  | n    | Keywordprg (`K` on the word under the cursor) |
@@ -249,7 +249,7 @@ straight there, several results open a list with a preview (like VS Code).
 | `<leader>gc` | n    | Copy commit URL     |
 | `<leader>gf` | n    | Copy file URL       |
 | `<leader>gd` | n    | Open diff view      |
-| `<leader>gh` | n    | File history        |
+| `<leader>gH` | n    | File history        |
 | `<leader>gs` | n    | Git status picker   |
 | `<leader>gS` | n    | Git stash picker    |
 | `<leader>gl` | n    | Git log             |
@@ -313,16 +313,19 @@ complete mapping and the prefix of longer ones, Neovim cannot know which you
 meant until you either type the next key or the timeout expires — so the bare
 key fires ~300ms late.
 
-Each is kept as-is because the bare key is the one worth having on the short
-keystroke. The table below lists what actually occupies each prefix, so you can
-judge whether a sub-key is worth keeping.
+Four such clashes used to exist and have been resolved by moving whichever side
+was used less often. The convention is now: **a lowercase leader key is a plain
+mapping, its group lives on the capital.**
 
-| Bare key | Delayed action | Held by | Those sub-keys do |
-| -------- | -------------- | ------- | ----------------- |
-| `<leader>w` | Save (normal mode) | `ws` `wo` `wa` `wr` `wd` `wc` | save workspace, open workspace, add folder to workspace, remove folder from workspace, delete workspace, show current workspace |
-| `<leader>q` | Close all buffers + open explorer | `qq` `qs` `qS` `ql` `qd` | quit all, restore session, select session, restore last session, stop saving current session |
-| `<leader>t` | Toggle terminal | `th` `tv` | terminal in a horizontal split, terminal in a vertical split |
-| `<leader>gh` | Diffview file history | `ghs` `ghr` `ghS` `ghR` `ghp` `ghd` | stage hunk, reset hunk, stage buffer, reset buffer, preview hunk inline, diff this file |
+| Was | Now | What moved |
+| --- | --- | ---------- |
+| `<leader>w` = save, `<leader>w*` = workspace | `<leader>w` saves, `<leader>W*` is the workspace group | the 6 workspace maps |
+| `<leader>q` = close all buffers, `<leader>q*` = quit/session | `<leader>q` closes buffers, `<leader>Q*` is quit/session | the 5 quit and session maps |
+| `<leader>t` = toggle terminal, `<leader>t*` = terminal splits | `<leader>t` toggles, `<leader>T*` splits | `Th` and `Tv` |
+| `<leader>gh` = file history, `<leader>gh*` = gitsigns hunks | `<leader>gH` is file history, `<leader>gh*` stays the hunk group | only file history — the 6 hunk maps are unchanged |
+
+Git is the one case where the bare key moved instead of the group: the hunk
+maps are six and used constantly, file history is one and occasional.
 
 ### Why `<leader>w` is not mapped in insert mode
 

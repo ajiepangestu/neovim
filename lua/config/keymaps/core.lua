@@ -79,7 +79,7 @@ end, { desc = "Format" })
 
 -- New file / quit
 vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New file" })
-vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
+vim.keymap.set("n", "<leader>Qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
 -- Inspect
 vim.keymap.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect position" })
