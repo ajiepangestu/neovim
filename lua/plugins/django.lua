@@ -1,3 +1,5 @@
+local Util = require("config.util")
+
 return {
 	-- Django tooling: djlint formatter and djls LSP
 	{
@@ -23,8 +25,35 @@ return {
 						end
 					end,
 				},
+				-- ruff resolves its own config per file, but without a root it starts
+				-- in single-file mode, so `ruff.toml` / `[tool.ruff]` settings sitting
+				-- beside manage.py are only picked up once this is set. Declared here
+				-- rather than in a `setup` hook: plugins/lsp.lua already defines one
+				-- for ruff, and a second would silently replace it.
+				ruff = { root_markers_extra = { ["manage.py"] = true } },
 				basedpyright = {
+					-- Point the server at the project's interpreter. Without this it
+					-- analyses with the python that started Neovim, and every symbol
+					-- from an installed package resolves to nothing: `models.CharField`
+					-- hovers as "Unknown" and goto-definition returns no result unless
+					-- Neovim happens to have been launched from an activated shell.
+					-- Picking a venv later with :VenvSelect updates the running client,
+					-- so this only has to get startup right.
+					before_init = function(_, config)
+						config.settings.python.pythonPath = Util.python_path(config.root_dir)
+					end,
+					-- A Django project is not guaranteed to have any of the markers
+					-- basedpyright ships with (pyproject.toml, setup.py,
+					-- requirements.txt, .git); manage.py is the one file it always has.
+					-- Without a root the server runs in single-file mode, where `grr`
+					-- only ever finds references inside the current buffer.
+					--
+					-- It matters when those markers DO exist, too: in a monorepo the
+					-- .git at the top would otherwise make the whole repo the python
+					-- root, while manage.py picks out the Django app directory.
+					root_markers_extra = { ["manage.py"] = true },
 					settings = {
+						python = {},
 						basedpyright = {
 							analysis = {
 								typeCheckingMode = "basic",
@@ -52,6 +81,86 @@ return {
 	},
 	-- htmldjango / python / toml parsers already come from plugins/treesitter.lua,
 	-- and htmldjango is a default filetype of emmet_language_server.
+
+	-- Debugging with debugpy. mason-nvim-dap's default handler registers the
+	-- `python` adapter and a plain "Launch file" configuration; the extras below
+	-- are the Django-specific ones, plus a launch config whose interpreter
+	-- follows the venv picked by venv-selector instead of whatever $VIRTUAL_ENV
+	-- happened to be at startup.
+	{
+		"jay-babu/mason-nvim-dap.nvim",
+		optional = true,
+		opts = function(_, opts)
+			opts.ensure_installed = opts.ensure_installed or {}
+			vim.list_extend(opts.ensure_installed, { "python" })
+		end,
+	},
+	{
+		"mfussenegger/nvim-dap",
+		optional = true,
+		-- nvim-dap takes no opts of its own; lazy still runs this before the
+		-- plugin's own config(), which is all this needs.
+		opts = function()
+			local dap = require("dap")
+			dap.configurations.python = vim.list_extend(dap.configurations.python or {}, {
+				{
+					type = "python",
+					request = "launch",
+					name = "Python: Launch file (venv)",
+					program = "${file}",
+					console = "integratedTerminal",
+					pythonPath = Util.python_path,
+				},
+				{
+					type = "python",
+					request = "launch",
+					name = "Django: runserver",
+					program = "${workspaceFolder}/manage.py",
+					-- --noreload: the autoreloader forks, and the debugger would stay
+					-- attached to the parent process where no breakpoint ever hits.
+					args = { "runserver", "--noreload" },
+					django = true,
+					console = "integratedTerminal",
+					pythonPath = Util.python_path,
+				},
+				{
+					type = "python",
+					request = "launch",
+					name = "Django: manage.py <command>",
+					program = "${workspaceFolder}/manage.py",
+					args = function()
+						return vim.split(vim.fn.input("manage.py "), " ", { trimempty = true })
+					end,
+					django = true,
+					console = "integratedTerminal",
+					pythonPath = Util.python_path,
+				},
+			})
+		end,
+	},
+
+	-- Test running with neotest. The interpreter comes from the same resolver
+	-- the language server and debugpy use, so a project venv is picked up
+	-- without the shell having activated it -- pytest-django and the settings
+	-- module it needs live in that venv, not in the system python.
+	{
+		"nvim-neotest/neotest",
+		optional = true,
+		dependencies = { "nvim-neotest/neotest-python" },
+		opts = {
+			adapters = {
+				["neotest-python"] = {
+					python = function()
+						return Util.python_path(Util.root())
+					end,
+					-- `runner` is left unset on purpose: neotest-python picks pytest
+					-- when the project has it and falls back to unittest, which is
+					-- what a Django project without pytest-django wants.
+					dap = { justMyCode = false },
+				},
+			},
+		},
+	},
 
 	-- Pick the virtualenv that basedpyright/ruff should use
 	{
