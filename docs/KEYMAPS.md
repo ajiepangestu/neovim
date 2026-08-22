@@ -265,12 +265,61 @@ picker without being restated in this config.
 | `<leader>pl` | n    | Open Lazy UI              |
 | `<leader>pm` | n    | Open Mason UI             |
 | `<leader>e`  | n    | Toggle file explorer      |
-| `<leader>t`  | n, t | Toggle terminal           |
-| `<leader>Th` | n, t | Terminal split horizontal |
-| `<leader>Tv` | n, t | Terminal split vertical   |
 | `<leader>gg` | n    | Open LazyGit              |
 | `<leader>?`  | n    | Buffer keymaps (which-key)|
 | `<leader>K`  | n    | Keywordprg (`K` on the word under the cursor) |
+
+## Terminal
+
+| Key          | Mode | Action                    |
+| ------------ | ---- | ------------------------- |
+| `<leader>t`  | n    | Toggle terminal           |
+| `<leader>Th` | n    | Terminal split horizontal (bottom) |
+| `<leader>Tv` | n    | Terminal split vertical (right)    |
+| `<A-t>`      | n, t | Toggle terminal           |
+| `<A-s>`      | n, t | Terminal split horizontal (bottom) |
+| `<A-v>`      | n, t | Terminal split vertical (right)    |
+| `<C-h/j/k/l>`| t    | Move to the window left/down/up/right |
+| `<Esc><Esc>` | t    | Leave terminal mode (double-tap) |
+| `q`          | n (in a terminal) | Hide the terminal |
+
+The `<leader>` maps are **normal mode only** and the `<A-...>` chords exist to
+cover terminal mode. The leader is `;`, so a terminal-mode leader mapping would
+make every `;` typed into the shell — or into a TUI like the claude CLI — sit
+pending until `timeoutlen` expires. See `lua/config/keymaps/ui.lua`.
+
+### Getting back to normal mode
+
+Two ways, both work:
+
+- `<Esc><Esc>` — twice within **200 ms**. This is snacks' `term_normal`.
+- `<C-\><C-n>` — Neovim's built-in, always available.
+
+A single `<Esc>` is deliberately **forwarded to the program** running in the
+terminal; otherwise `<Esc>` in a TUI would be swallowed by Neovim and never
+reach it. That is why the first press does nothing visible.
+
+### Why the terminal cwd is memoised
+
+snacks derives a terminal's identity from `cmd + cwd + env + count`, so the
+*same* cwd string has to come back on every call or `toggle` will not recognise
+the terminal it opened and will open a second one instead of hiding the first.
+
+`Util.root()` answers for the current buffer, and a terminal buffer has no file
+to detect a root from — it falls back to the editor cwd, a different string
+from the project root whenever nvim was started outside the project. Pressing
+`<A-t>` from inside the terminal therefore spawned a new terminal every time.
+
+`terminal_cwd()` in `lua/config/keymaps/ui.lua` fixes this: it remembers the
+root of the last real file buffer and keeps answering with it while the cursor
+sits somewhere that cannot know better (a terminal, the explorer, a picker).
+
+### If `<A-...>` does nothing at all
+
+Neovim normalises `<A-x>` to `<M-x>`, so check with `:map <M-t>` — the mapping
+is registered in both `n` and `t`. If it is listed and the key still does
+nothing, the terminal emulator is not delivering Alt (some send it as an ESC
+prefix, some keep it for their own menus). `;t` from normal mode always works.
 
 ## OpenCode
 

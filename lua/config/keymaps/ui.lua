@@ -18,16 +18,43 @@ end, { desc = "Toggle explorer" })
 -- Normal mode only: the leader is `;`, so a terminal-mode leader mapping makes
 -- every `;` typed into the shell -- or into a TUI like the claude CLI -- sit
 -- pending until 'timeoutlen' expires. The <A-...> keys below cover terminal mode.
+
+---The cwd every terminal mapping below opens with.
+---
+---snacks derives a terminal's identity from the cwd it was opened with, so the
+---SAME cwd has to come back on every call -- otherwise `toggle` fails to find
+---the terminal it opened and cheerfully opens a second one instead of hiding
+---the first.
+---
+---Util.root() alone is not stable enough for that. It answers for the current
+---buffer, and a terminal buffer has no file to detect a root from, so it falls
+---back to the editor's cwd -- which is a different string from the project root
+---whenever nvim was started outside the project. Pressing the toggle from
+---inside the terminal then opened a new one every time.
+---
+---So: remember the root from the last real file buffer, and keep answering with
+---it while the cursor sits somewhere that cannot know better (a terminal, the
+---explorer, a picker).
+---@type string?
+local term_root
+local function terminal_cwd()
+	local buf = vim.api.nvim_get_current_buf()
+	if vim.bo[buf].buftype == "" and vim.api.nvim_buf_get_name(buf) ~= "" then
+		term_root = Util.root()
+	end
+	return term_root or Util.root()
+end
+
 vim.keymap.set("n", "<leader>t", function()
-	Snacks.terminal.toggle(nil, { cwd = Util.root() })
+	Snacks.terminal.toggle(nil, { cwd = terminal_cwd() })
 end, { desc = "Toggle terminal" })
 
 vim.keymap.set("n", "<leader>Th", function()
-	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "bottom" } })
+	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "bottom" } })
 end, { desc = "Terminal split horizontal" })
 
 vim.keymap.set("n", "<leader>Tv", function()
-	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "right" } })
+	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "right" } })
 end, { desc = "Terminal split vertical" })
 
 -- Split off another terminal without leaving terminal mode first. Reaching for
@@ -40,15 +67,15 @@ end, { desc = "Terminal split vertical" })
 -- is not reliable once a modifier has to be released in between. A chord has no
 -- such window. Alt is free here -- the claude CLI only reads <A-CR>.
 vim.keymap.set({ "n", "t" }, "<A-v>", function()
-	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "right" } })
+	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "right" } })
 end, { desc = "Terminal split vertical" })
 
 vim.keymap.set({ "n", "t" }, "<A-s>", function()
-	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "bottom" } })
+	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "bottom" } })
 end, { desc = "Terminal split horizontal" })
 
 vim.keymap.set({ "n", "t" }, "<A-t>", function()
-	Snacks.terminal.toggle(nil, { cwd = Util.root() })
+	Snacks.terminal.toggle(nil, { cwd = terminal_cwd() })
 end, { desc = "Toggle terminal" })
 
 -- Scratch buffers
