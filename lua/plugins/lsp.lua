@@ -16,6 +16,8 @@ return {
 				"tailwindcss-language-server",
 				"html-lsp",
 				"css-lsp",
+				"json-lsp",
+				"yaml-language-server",
 				"omnisharp",
 				"fsautocomplete",
 				-- tools
@@ -23,6 +25,7 @@ return {
 				"shfmt",
 				"ruff",
 				"prettier",
+				"prettierd",
 				"csharpier",
 				"fantomas",
 			},
@@ -32,10 +35,19 @@ return {
 
 			local registry = require("mason-registry")
 			registry.refresh(function()
+				-- `ensure_installed` is opts_extend, so several plugin files asking
+				-- for the same tool (djlint is requested by both django.lua and
+				-- lint.lua) leave duplicates in the list. Without this, the first
+				-- install is still running when the second is queued -- is_installed()
+				-- is false for both -- and mason downloads the package twice.
+				local seen = {}
 				for _, tool in ipairs(opts.ensure_installed) do
-					local ok, pkg = pcall(registry.get_package, tool)
-					if ok and not pkg:is_installed() then
-						pkg:install()
+					if not seen[tool] then
+						seen[tool] = true
+						local ok, pkg = pcall(registry.get_package, tool)
+						if ok and not pkg:is_installed() then
+							pkg:install()
+						end
 					end
 				end
 			end)
@@ -58,7 +70,7 @@ return {
 		-- ~1000 items vtsls returns at a bare cursor. Measured: no difference in
 		-- gopls/vtsls/html/cssls responses, and buffer-open time is unchanged
 		-- within noise even though this makes blink load at BufReadPre.
-		dependencies = { "mason-org/mason.nvim", "saghen/blink.cmp" },
+		dependencies = { "mason-org/mason.nvim", "saghen/blink.cmp", "b0o/schemastore.nvim" },
 		-- lazy resolves these as literal dotted paths -- `*` is NOT a wildcard, it
 		-- would look for a key actually named "*". List each server explicitly.
 		opts_extend = { "servers.vtsls.keys", "servers.eslint.keys" },
@@ -79,6 +91,11 @@ return {
 				},
 			},
 			inlay_hints = { enabled = true, exclude = {} },
+			-- Unlike document colours, code lenses are not on by default: a server
+			-- that advertises them (gopls: generate, test, tidy, govulncheck, ...)
+			-- shows nothing until vim.lsp.codelens.enable() is called for the
+			-- buffer. Without this the `codelenses` block in plugins/go.lua is inert.
+			codelens = { enabled = true },
 
 			-- Settings merged into every server, and per-server config.
 			-- Set a server to `false` to disable it.
@@ -137,6 +154,22 @@ return {
 						},
 						typescript = {
 							updateImportsOnFileMove = { enabled = "always" },
+							-- tsserver defaults to a 3GB heap. A Next.js app of any size --
+							-- app router, generated route types, a UI package -- walks into
+							-- that ceiling, and the failure mode is the server dying and
+							-- silently restarting rather than an error message.
+							tsserver = { maxTsServerMemory = 8192 },
+							preferences = {
+								-- Auto-imports follow the `@/...` aliases from tsconfig paths
+								-- instead of emitting "../../../lib/utils". With no paths
+								-- configured TypeScript falls back to a relative specifier, so
+								-- this is safe in plain projects too.
+								importModuleSpecifier = "non-relative",
+								-- `import type { X }` for type-only uses, which is what the
+								-- Next.js compiler wants: a value import of a type drags the
+								-- module into the bundle.
+								preferTypeOnlyAutoImports = true,
+							},
 							suggest = { completeFunctionCalls = true },
 							inlayHints = {
 								enumMemberValues = { enabled = true },
@@ -159,6 +192,13 @@ return {
 								eelixir = "html-eex",
 								heex = "html-eex",
 							},
+							-- Classes written inside a helper call rather than in a
+							-- `class=` attribute. Without this, every class in a
+							-- shadcn/ui component -- which is all of them, since they
+							-- go through `cn()` and `cva()` -- gets no completion, no
+							-- hover and no colour swatch. `classAttributes` already
+							-- covers class/className/classList by default.
+							classFunctions = { "cn", "clsx", "cx", "cva", "tv", "twMerge", "twJoin" },
 						},
 					},
 				},
@@ -167,6 +207,24 @@ return {
 				-- Complements emmet (which only expands abbreviations) and
 				-- tailwindcss (which only knows class names).
 				html = {},
+
+				-- Schema-aware completion and validation for the config files that
+				-- come with these stacks: tsconfig.json, package.json,
+				-- docker-compose.yml, GitHub workflows. Schemas are injected from
+				-- SchemaStore in the setup hooks below.
+				jsonls = {
+					settings = { json = { validate = { enable = true } } },
+				},
+				yamlls = {
+					settings = {
+						yaml = {
+							validate = true,
+							-- SchemaStore supplies these; the built-in store would
+							-- otherwise fight it and produce duplicate diagnostics.
+							schemaStore = { enable = false, url = "" },
+						},
+					},
+				},
 
 				-- Property completion, value hints and colour swatches for css.
 				cssls = {
@@ -205,6 +263,14 @@ return {
 						end,
 					})
 				end,
+				-- Schemas are fetched from the schemastore plugin at config time so
+				-- the (large) catalogue is not built while the spec is loaded.
+				jsonls = function(_, sopts)
+					sopts.settings.json.schemas = require("schemastore").json.schemas()
+				end,
+				yamlls = function(_, sopts)
+					sopts.settings.yaml.schemas = require("schemastore").yaml.schemas()
+				end,
 				tailwindcss = function(_, sopts)
 					local defaults = vim.lsp.config.tailwindcss or {}
 					sopts.filetypes = vim.list_extend(vim.deepcopy(defaults.filetypes or {}), sopts.filetypes or {})
@@ -236,6 +302,29 @@ return {
 							and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buf].filetype)
 						then
 							vim.lsp.inlay_hint.enable(true, { bufnr = buf })
+						end
+					end,
+				})
+			end
+
+			if opts.codelens.enabled then
+				vim.api.nvim_create_autocmd("LspAttach", {
+					group = vim.api.nvim_create_augroup("user_codelens", { clear = true }),
+					callback = function(args)
+						local client = vim.lsp.get_client_by_id(args.data.client_id)
+						local buf = args.buf
+						if client and client:supports_method("textDocument/codeLens") and vim.bo[buf].buftype == "" then
+							-- No manual refresh loop: like inlay hints, codelens is a
+							-- capability in 0.12 that attaches to the buffer and
+							-- re-requests on change by itself. (`codelens.refresh()`
+							-- is deprecated and just calls this.)
+							vim.lsp.codelens.enable(true, { bufnr = buf })
+							-- Buffer-local so the mapping exists only where there is
+							-- something to run.
+							vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, {
+								buffer = buf,
+								desc = "Run code lens",
+							})
 						end
 					end,
 				})
@@ -279,26 +368,33 @@ return {
 					sopts = sopts == true and {} or sopts
 					local setup = opts.setup[server]
 					if not (setup and setup(server, sopts)) then
-						-- `filetypes_extra` appends to whatever lspconfig ships,
-						-- instead of replacing it like `filetypes` would. It is a
-						-- SET, not a list, on purpose: lazy merges maps key by key
-						-- but replaces lists wholesale, so a set lets several plugin
-						-- files each add filetypes to the same server without
-						-- clobbering one another. Sorted so the result is stable.
-						if sopts.filetypes_extra then
-							local extra = {}
-							for ft in pairs(sopts.filetypes_extra) do
-								extra[#extra + 1] = ft
+						-- `filetypes_extra` and `root_markers_extra` append to whatever
+						-- lspconfig ships, instead of replacing it like `filetypes` or
+						-- `root_markers` would. They are SETS, not lists, on purpose:
+						-- lazy merges maps key by key but replaces lists wholesale, so a
+						-- set lets several plugin files add to the same server without
+						-- clobbering one another. A `setup` hook cannot do this job --
+						-- there is one per server and the last file to define it wins,
+						-- silently. Sorted so the result is stable.
+						local defaults = vim.lsp.config[server] or {}
+						for key, extra_key in pairs({
+							filetypes = "filetypes_extra",
+							root_markers = "root_markers_extra",
+						}) do
+							if sopts[extra_key] then
+								local extra = {}
+								for value in pairs(sopts[extra_key]) do
+									extra[#extra + 1] = value
+								end
+								table.sort(extra)
+								sopts[key] = vim.list_extend(vim.deepcopy(defaults[key] or {}), extra)
 							end
-							table.sort(extra)
-							local defaults = vim.lsp.config[server] or {}
-							sopts.filetypes = vim.list_extend(vim.deepcopy(defaults.filetypes or {}), extra)
 						end
 
-						-- `keys` and `filetypes_extra` are ours, not vim.lsp.Config
+						-- These three keys are ours, not vim.lsp.Config
 						local cfg = {}
 						for k, v in pairs(sopts) do
-							if k ~= "keys" and k ~= "filetypes_extra" then
+							if k ~= "keys" and k ~= "filetypes_extra" and k ~= "root_markers_extra" then
 								cfg[k] = v
 							end
 						end
