@@ -23,6 +23,19 @@
 | `:MonorepoSetup` | Auto-generate config files for monorepo (Django + Next.js) |
 | `:DjangoInstall` | Install Django dependencies with virtualenv safety checks |
 | `:VenvStatus` | Check if virtualenv is currently active |
+| `:LspEslintFixAll` | Apply every ESLint auto-fix in the buffer (also runs on save) |
+
+## Go
+
+`gomodifytags` and `gotests` are installed by Mason; both rewrite the file on
+disk and the buffer is reloaded afterwards.
+
+| Command | Description |
+|---------|-------------|
+| `:GoTagAdd [tags]` | Add tags (default `json`) to the struct under the cursor, e.g. `:GoTagAdd json,form` |
+| `:GoTagRemove [tags]` | Remove tags (default `json`) from the struct under the cursor |
+| `:GoTests` | Generate a table-driven test for the function under the cursor |
+| `:GoTests!` | Generate tests for every function in the file |
 
 ## Workspaces
 

@@ -101,6 +101,7 @@ straight there, several results open a list with a preview (like VS Code).
 | `<leader>le` | n    | Buffer diagnostics picker |
 | `<leader>lE` | n    | All diagnostics picker    |
 | `<leader>li` | n    | LSP info (checkhealth)    |
+| `<leader>cl` | n    | Run code lens (servers that provide one, e.g. gopls on go.mod / tests) |
 | `<leader>cv` | n    | Select Python virtualenv  |
 | `<leader>xx` | n    | Diagnostics (Trouble)     |
 | `<leader>cs` | n    | Symbols (Trouble)         |
@@ -115,6 +116,63 @@ straight there, several results open a list with a preview (like VS Code).
 | `<leader>cD` | n    | Fix all diagnostics       |
 | `<leader>co` | n    | Organize imports          |
 | `<leader>cE` | n    | ESLint fix all (in eslint buffers) |
+
+### Go (gopls buffers)
+
+`gomodifytags` and `gotests` are wrapped as commands; see `docs/COMMANDS.md`.
+
+| Key          | Mode | Action                              |
+| ------------ | ---- | ----------------------------------- |
+| `<leader>ct` | n    | Add `json` struct tags to the struct under the cursor |
+| `<leader>cT` | n    | Add struct tags, prompting for which ones (`json,form`, …) |
+| `<leader>cR` | n    | Remove `json` struct tags           |
+| `<leader>cg` | n    | Generate a table-driven test for the function under the cursor |
+| `<leader>cl` | n    | Run the code lens under the cursor (`go.mod`: tidy, upgrade; tests: run) |
+
+## Testing (neotest)
+
+Under `<leader>N`, not `<leader>t`: `;t` is already "toggle terminal" and `;T`
+its split group. Adapters: Go, python/pytest, vitest and jest — whichever one
+recognises the project claims the file.
+
+| Key          | Mode | Action                       |
+| ------------ | ---- | ---------------------------- |
+| `<leader>Nr` | n    | Run nearest test             |
+| `<leader>Nf` | n    | Run every test in the file   |
+| `<leader>Na` | n    | Run the whole suite          |
+| `<leader>Nl` | n    | Run last test again          |
+| `<leader>Nx` | n    | Stop the running test        |
+| `<leader>Ns` | n    | Toggle the test summary tree |
+| `<leader>No` | n    | Show output for the nearest test |
+| `<leader>NO` | n    | Toggle the output panel      |
+| `<leader>Nw` | n    | Toggle watch mode for the file |
+| `<leader>Nd` | n    | Debug nearest test (through nvim-dap) |
+
+## Debug (nvim-dap)
+
+Under `<leader>D`, not `<leader>d`: the lowercase key is already "close buffer",
+and a key that is both a mapping and a prefix waits out `timeoutlen` — see
+Known Keymap Conflicts below.
+
+Adapters come from the stack files: delve for Go, debugpy for Python/Django,
+vscode-js-debug for Node and Chrome. A project's own `.vscode/launch.json` is
+read on every `<leader>Dc`, so configurations defined there show up in the
+picker without being restated in this config.
+
+| Key          | Mode | Action                         |
+| ------------ | ---- | ------------------------------ |
+| `<leader>Dc` | n    | Continue / start a session     |
+| `<leader>Db` | n    | Toggle breakpoint              |
+| `<leader>DB` | n    | Breakpoint with a condition    |
+| `<leader>DC` | n    | Run to cursor                  |
+| `<leader>Di` | n    | Step into                      |
+| `<leader>Do` | n    | Step over                      |
+| `<leader>DO` | n    | Step out                       |
+| `<leader>Dl` | n    | Run last configuration again   |
+| `<leader>Dt` | n    | Terminate the session          |
+| `<leader>Dr` | n    | Toggle the REPL                |
+| `<leader>Du` | n    | Toggle the debug UI (dap-ui)   |
+| `<leader>De` | n, v | Evaluate expression under cursor / selection |
 
 ## Picker (snacks)
 

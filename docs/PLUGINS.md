@@ -24,6 +24,8 @@
 |--------|-------------|
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter manager (see Formatters by Filetype below) |
 | [basedpyright](https://github.com/DetachHead/basedpyright) | Python LSP with Django ORM support (replaces pyright) |
+| [nvim-lint](https://github.com/mfussenegger/nvim-lint) | Linters the language servers do not cover: `djlint` for Django templates, `golangci-lint` for Go (on write only — it type-checks the whole package) |
+| [neotest](https://github.com/nvim-neotest/neotest) | Test runner, keys under `<leader>N`. Adapters: [neotest-golang](https://github.com/fredrikaverpil/neotest-golang), [neotest-python](https://github.com/nvim-neotest/neotest-python), [neotest-vitest](https://github.com/marilari88/neotest-vitest), [neotest-jest](https://github.com/nvim-neotest/neotest-jest) |
 
 ### Formatters by Filetype
 
@@ -33,8 +35,16 @@
 | Django templates | `djlint --profile django` |
 | Go | `goimports` + `gofumpt` |
 | C# (.NET) | `csharpier` |
-| TypeScript, JavaScript, TSX, JSX | `prettier` |
-| HTML, CSS, JSON, YAML, Markdown | `prettier` |
+| TypeScript, JavaScript, TSX, JSX, JSON | `biome` if the project has a `biome.json`, else `prettierd`, else `prettier` |
+| HTML, CSS, YAML, Markdown | `prettierd`, falling back to `prettier` |
+
+`prettierd` is prettier kept warm as a daemon (~0.07s per format against ~0.17s
+for `prettier`). Go templates living in `.html` files are excluded — see
+`is_go_template` in `lua/plugins/go.lua`.
+
+ESLint's own auto-fixes are applied on save in buffers where the eslint server
+is attached, before prettier runs. `<leader>uf` / `<leader>uF` turn that off
+along with the rest of format-on-save.
 
 ### Django ORM Setup
 
@@ -138,28 +148,36 @@ The `html` server ships with `filetypes = { "html" }` only. `htmldjango` and
 Go templates are html with a template syntax layered on top — verified to
 produce no false diagnostics on `{% if %}` or `{{ }}` inside attributes.
 
-### `filetypes_extra`
+### `filetypes_extra` and `root_markers_extra`
 
-A server spec may set `filetypes_extra`, a **set** of filetypes to append to
-whatever lspconfig ships, rather than replacing the list like `filetypes` would:
+A server spec may set either of these, a **set** of values to append to whatever
+lspconfig ships, rather than replacing the list like `filetypes` / `root_markers`
+would:
 
 ```lua
-html = { filetypes_extra = { htmldjango = true } }   -- in django.lua
-html = { filetypes_extra = { gohtmltmpl = true } }   -- in go.lua
+html = { filetypes_extra = { htmldjango = true } }             -- in django.lua
+html = { filetypes_extra = { gohtmltmpl = true } }             -- in go.lua
+ruff = { root_markers_extra = { ["manage.py"] = true } }       -- in django.lua
 ```
 
-It is a set and not a list on purpose. lazy.nvim merges maps key by key but
+They are sets and not lists on purpose. lazy.nvim merges maps key by key but
 replaces lists wholesale, so two plugin files each adding a list to the same
 server would silently lose one of them. `opts_extend` does not help here: its
 dotted paths are literal, so `servers.*.keys` looks for a key actually named
 `*` and never matches.
 
+A `setup` hook cannot do this job either. There is exactly one per server, and
+whichever plugin file is merged last silently replaces the others — `lua/plugins`
+is imported in alphabetical order, so `django.lua` defining `setup.ruff` would
+have thrown away the one in `lsp.lua` that hands hover to basedpyright.
+
 Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_FIBER.md).
 
 ## Mason Installed Tools
 
-Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua` and
-`nextjs.lua`, installed on first start.
+Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua`,
+`nextjs.lua`, `go.lua` and `lint.lua`, installed on first start. Duplicate
+requests are de-duplicated before install.
 
 | Tool | Purpose |
 |------|---------|
@@ -176,7 +194,10 @@ Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua` and
 | `emmet-language-server` | Emmet abbreviations |
 | `gofumpt`, `goimports` | Go formatters |
 | `omnisharp` / `fsautocomplete` | C# / F# LSP |
-| `prettier` | Prettier formatter |
+| `prettier`, `prettierd` | Prettier formatter, and its daemon |
+| `golangci-lint` | Go linter (errcheck, unused, …) |
+| `gomodifytags` | Add/remove struct tags (`:GoTagAdd`) |
+| `gotests` | Generate table-driven tests (`:GoTests`) |
 | `csharpier`, `fantomas` | C# / F# formatters |
 | `stylua`, `shfmt` | Lua and shell formatters |
 
