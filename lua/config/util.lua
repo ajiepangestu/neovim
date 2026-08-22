@@ -106,6 +106,21 @@ end
 -- Formatting
 --------------------------------------------------------------------------------
 
+---Should this buffer be reformatted on save? Buffer-local `autoformat` wins over
+---the global one, so <leader>uF can exempt a single buffer from a global yes.
+---
+---Lives here because more than one thing keys off it: conform's format_on_save
+---and the eslint fix-all pass in plugins/nextjs.lua, which has to make the same
+---decision so <leader>uf turns off the whole on-save pipeline, not half of it.
+---@param buf number
+---@return boolean
+function M.autoformat_enabled(buf)
+	if vim.b[buf].autoformat ~= nil then
+		return vim.b[buf].autoformat
+	end
+	return vim.g.autoformat ~= false
+end
+
 ---Format the current buffer with conform (LSP as fallback).
 ---@param opts? conform.FormatOpts
 function M.format(opts)
@@ -113,6 +128,38 @@ function M.format(opts)
 		lsp_format = "fallback",
 		timeout_ms = 3000,
 	}, opts or {}))
+end
+
+--------------------------------------------------------------------------------
+-- Python
+--------------------------------------------------------------------------------
+
+---The interpreter a python project should be driven with: an activated venv
+---wins, then a venv sitting in the project itself, then whatever python3 is on
+---$PATH.
+---
+---Resolved at call time, never when a spec is loaded. venv-selector sets
+---$VIRTUAL_ENV when a venv is picked, nvim-dap calls function values in a
+---configuration just before starting a session, and neotest asks per run -- so
+---all three see the current pick.
+---@param root? string project directory to look for a venv in (default: cwd)
+---@return string
+function M.python_path(root)
+	local venv = vim.env.VIRTUAL_ENV or vim.env.CONDA_PREFIX
+	if venv and venv ~= "" then
+		local exe = venv .. "/bin/python"
+		if vim.uv.fs_stat(exe) then
+			return exe
+		end
+	end
+	for _, dir in ipairs({ ".venv", "venv", "env" }) do
+		local exe = (root or vim.fn.getcwd()) .. "/" .. dir .. "/bin/python"
+		if vim.uv.fs_stat(exe) then
+			return exe
+		end
+	end
+	local system = vim.fn.exepath("python3")
+	return system ~= "" and system or "python"
 end
 
 --------------------------------------------------------------------------------

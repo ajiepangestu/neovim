@@ -13,18 +13,43 @@ vim.keymap.set("n", "<leader>e", function()
 	Explorer.toggle()
 end, { desc = "Toggle explorer" })
 
--- Terminal toggles (all use Snacks.terminal for consistency)
-vim.keymap.set({ "n", "t" }, "<leader>t", function()
+-- Terminal toggles (all use Snacks.terminal for consistency).
+--
+-- Normal mode only: the leader is `;`, so a terminal-mode leader mapping makes
+-- every `;` typed into the shell -- or into a TUI like the claude CLI -- sit
+-- pending until 'timeoutlen' expires. The <A-...> keys below cover terminal mode.
+vim.keymap.set("n", "<leader>t", function()
 	Snacks.terminal.toggle(nil, { cwd = Util.root() })
 end, { desc = "Toggle terminal" })
 
-vim.keymap.set({ "n", "t" }, "<leader>Th", function()
+vim.keymap.set("n", "<leader>Th", function()
 	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "bottom" } })
 end, { desc = "Terminal split horizontal" })
 
-vim.keymap.set({ "n", "t" }, "<leader>Tv", function()
+vim.keymap.set("n", "<leader>Tv", function()
 	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "right" } })
 end, { desc = "Terminal split vertical" })
+
+-- Split off another terminal without leaving terminal mode first. Reaching for
+-- <Esc> instead is what a long-running TUI notices: snacks' double-escape
+-- forwards the first <Esc> to the program (see snacks/terminal.lua term_normal),
+-- which is an interrupt to the claude CLI. These never reach the program.
+--
+-- Single chords, not a prefix sequence: with 'timeoutlen' at 300ms a two-key
+-- mapping only fires if the second key lands within 300ms of the first, which
+-- is not reliable once a modifier has to be released in between. A chord has no
+-- such window. Alt is free here -- the claude CLI only reads <A-CR>.
+vim.keymap.set({ "n", "t" }, "<A-v>", function()
+	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "right" } })
+end, { desc = "Terminal split vertical" })
+
+vim.keymap.set({ "n", "t" }, "<A-s>", function()
+	Snacks.terminal.open(nil, { cwd = Util.root(), win = { position = "bottom" } })
+end, { desc = "Terminal split horizontal" })
+
+vim.keymap.set({ "n", "t" }, "<A-t>", function()
+	Snacks.terminal.toggle(nil, { cwd = Util.root() })
+end, { desc = "Toggle terminal" })
 
 -- Scratch buffers
 vim.keymap.set("n", "<leader>.", function()

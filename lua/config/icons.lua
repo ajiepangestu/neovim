@@ -16,6 +16,19 @@ return {
 		modified = " ",
 		removed = " ",
 	},
+	test = {
+		Passed = " ",
+		Failed = " ",
+		Running = " ",
+		Skipped = "○ ",
+	},
+	dap = {
+		Stopped = "󰁕 ",
+		Breakpoint = " ",
+		BreakpointCondition = " ",
+		BreakpointRejected = " ",
+		LogPoint = ".>",
+	},
 	kinds = {
 		Array = " ",
 		Boolean = "󰨙 ",
