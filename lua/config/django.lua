@@ -10,20 +10,59 @@ local function is_venv_active()
 	return false, nil
 end
 
+---Compare two paths as the filesystem sees them: $VIRTUAL_ENV and the path
+---built from getcwd() can be spelled differently (trailing slash, symlink) and
+---still be the same directory. Without this the "differs from project venv"
+---prompt fires on a venv that is in fact the right one.
+local function same_path(a, b)
+	if not a or not b then
+		return false
+	end
+	return (vim.uv.fs_realpath(a) or vim.fs.normalize(a)) == (vim.uv.fs_realpath(b) or vim.fs.normalize(b))
+end
+
+---@return string|nil
 local function get_venv_path(project_path)
 	local venv_path = project_path .. "/.venv"
-	if vim.fn.isdirectory(venv_path) then
+	-- `== 1`, not truthiness: isdirectory() returns 0/1 and 0 is truthy in Lua,
+	-- so a bare `if` here would report every project as having a .venv.
+	if vim.fn.isdirectory(venv_path) == 1 then
 		return venv_path
 	end
 	return nil
 end
 
-local function run_command(cmd, cwd)
-	local result = vim.fn.systemlist(cmd)
-	local exit_code = vim.v.shell_error
-	return result, exit_code == 0
+---Install `packages` one after another, each one starting only once the
+---previous has finished. Asynchronous on purpose: pip resolving and building a
+---package takes tens of seconds, and vim.fn.systemlist() would freeze the whole
+---editor for that entire time.
+local function install_next(pip_path, packages, cwd, index, on_done)
+	local package = packages[index]
+	if not package then
+		return on_done(true)
+	end
+
+	vim.notify("Installing " .. package .. "...", vim.log.levels.INFO)
+	vim.system({ pip_path, "install", package }, { cwd = cwd, text = true }, function(out)
+		vim.schedule(function()
+			if out.code ~= 0 then
+				vim.notify("✗ Failed to install " .. package, vim.log.levels.ERROR)
+				local detail = out.stderr ~= "" and out.stderr or out.stdout
+				if detail and detail ~= "" then
+					vim.notify(detail, vim.log.levels.ERROR)
+				end
+				return on_done(false)
+			end
+			vim.notify("✓ " .. package .. " installed", vim.log.levels.INFO)
+			install_next(pip_path, packages, cwd, index + 1, on_done)
+		end)
+	end)
 end
 
+---Kicks off the install and returns immediately; the guards below return early
+---for the same reason, so none of them report a result. Whether the packages
+---actually landed is reported by install_next through vim.notify, long after
+---this has returned.
 local function install_dependencies(project_path, packages)
 	local venv_path = get_venv_path(project_path)
 
@@ -33,7 +72,7 @@ local function install_dependencies(project_path, packages)
 		vim.notify("  cd " .. vim.fn.fnamemodify(project_path, ":t"), vim.log.levels.INFO)
 		vim.notify("  python -m venv .venv", vim.log.levels.INFO)
 		vim.notify("  source .venv/bin/activate", vim.log.levels.INFO)
-		return false
+		return
 	end
 
 	local active, active_venv = is_venv_active()
@@ -43,45 +82,39 @@ local function install_dependencies(project_path, packages)
 		vim.notify("  cd " .. vim.fn.fnamemodify(project_path, ":t"), vim.log.levels.INFO)
 		vim.notify("  source .venv/bin/activate", vim.log.levels.INFO)
 		vim.notify("\nThen restart Neovim and run :DjangoInstall again", vim.log.levels.INFO)
-		return false
+		return
 	end
 
-	if active_venv ~= venv_path then
-		vim.notify("Warning: Active venv (" .. active_venv .. ") differs from project venv (" .. venv_path .. ")", vim.log.levels.WARN)
+	if not same_path(active_venv, venv_path) then
+		vim.notify(
+			"Warning: Active venv (" .. active_venv .. ") differs from project venv (" .. venv_path .. ")",
+			vim.log.levels.WARN
+		)
 		local continue = vim.fn.confirm("Continue with active venv?", "&Yes\n&No", 2)
 		if continue ~= 1 then
 			vim.notify("Cancelled", vim.log.levels.INFO)
-			return false
+			return
 		end
 	end
 
 	vim.notify("Installing packages in virtualenv: " .. active_venv, vim.log.levels.INFO)
 
+	-- A venv created by `uv venv` has no pip at all, so this fallback is not
+	-- theoretical. `== 1` for the same reason as isdirectory() above.
 	local pip_path = active_venv .. "/bin/pip"
-	if not vim.fn.filereadable(pip_path) then
+	if vim.fn.filereadable(pip_path) ~= 1 then
 		pip_path = "pip"
 	end
 
-	for _, package in ipairs(packages) do
-		vim.notify("Installing " .. package .. "...", vim.log.levels.INFO)
-		local cmd = { pip_path, "install", package }
-		local result, success = run_command(cmd, project_path)
-
-		if success then
-			vim.notify("✓ " .. package .. " installed", vim.log.levels.INFO)
-		else
-			vim.notify("✗ Failed to install " .. package, vim.log.levels.ERROR)
-			vim.notify(table.concat(result, "\n"), vim.log.levels.ERROR)
-			return false
+	install_next(pip_path, packages, project_path, 1, function(ok)
+		if not ok then
+			return
 		end
-	end
-
-	vim.notify("\nAll packages installed successfully!", vim.log.levels.INFO)
-	vim.notify("\nNext steps:", vim.log.levels.INFO)
-	vim.notify("1. Restart LSP: :LspRestart", vim.log.levels.INFO)
-	vim.notify("2. Open a Python file to activate basedpyright", vim.log.levels.INFO)
-
-	return true
+		vim.notify("\nAll packages installed successfully!", vim.log.levels.INFO)
+		vim.notify("\nNext steps:", vim.log.levels.INFO)
+		vim.notify("1. Restart LSP: :LspRestart", vim.log.levels.INFO)
+		vim.notify("2. Open a Python file to activate basedpyright", vim.log.levels.INFO)
+	end)
 end
 
 local function django_install()

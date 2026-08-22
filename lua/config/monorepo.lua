@@ -80,7 +80,8 @@ local function detect_django_folder(root_path)
 
 	for _, folder in ipairs(candidates) do
 		local path = root_path .. "/" .. folder
-		if vim.fn.isdirectory(path) then
+		-- `== 1`, not truthiness: isdirectory() returns 0/1 and 0 is truthy in Lua.
+		if vim.fn.isdirectory(path) == 1 then
 			if file_exists(path .. "/manage.py") or file_exists(path .. "/requirements.txt") then
 				return folder
 			end
@@ -89,7 +90,7 @@ local function detect_django_folder(root_path)
 
 	for _, item in ipairs(vim.fn.readdir(root_path)) do
 		local path = root_path .. "/" .. item
-		if vim.fn.isdirectory(path) and file_exists(path .. "/manage.py") then
+		if vim.fn.isdirectory(path) == 1 and file_exists(path .. "/manage.py") then
 			return item
 		end
 	end
@@ -116,7 +117,8 @@ local function check_pyproject_toml(api_path)
 end
 
 local function create_pyright_config(api_path, settings_module)
-	local config = string.format([[{
+	local config = string.format(
+		[[{
   "venvPath": ".",
   "venv": ".venv",
   "pythonVersion": "3.11",
@@ -132,7 +134,9 @@ local function create_pyright_config(api_path, settings_module)
     "DJANGO_SETTINGS_MODULE": "%s"
   }
 }
-]], settings_module)
+]],
+		settings_module
+	)
 
 	local path = api_path .. "/pyrightconfig.json"
 	if file_exists(path) then
@@ -148,7 +152,8 @@ local function create_pyright_config(api_path, settings_module)
 end
 
 local function add_to_pyproject_toml(api_path, settings_module)
-	local config = string.format([[
+	local config = string.format(
+		[[
 
 [tool.basedpyright]
 venvPath = "."
@@ -165,7 +170,9 @@ exclude = ["**/node_modules", "**/__pycache__", "**/.venv"]
 
 [tool.basedpyright.defineConstant]
 DJANGO_SETTINGS_MODULE = "%s"
-]], settings_module)
+]],
+		settings_module
+	)
 
 	local path = api_path .. "/pyproject.toml"
 	if append_to_file(path, config) then
@@ -212,7 +219,10 @@ local function setup_monorepo()
 	local django_folder = detect_django_folder(cwd)
 	if not django_folder then
 		vim.notify("No Django project folder found in " .. cwd, vim.log.levels.ERROR)
-		vim.notify("Expected folder with manage.py: api/, backend/, server/, django/, app/, or python/", vim.log.levels.INFO)
+		vim.notify(
+			"Expected folder with manage.py: api/, backend/, server/, django/, app/, or python/",
+			vim.log.levels.INFO
+		)
 		return
 	end
 
@@ -228,7 +238,7 @@ local function setup_monorepo()
 		end
 
 		local final_api_path = cwd .. "/" .. folder_name
-		if not vim.fn.isdirectory(final_api_path) then
+		if vim.fn.isdirectory(final_api_path) ~= 1 then
 			vim.notify("Folder " .. folder_name .. " does not exist", vim.log.levels.ERROR)
 			return
 		end
@@ -256,7 +266,10 @@ local function setup_monorepo()
 			local pyproject_status = check_pyproject_toml(final_api_path)
 
 			if pyproject_status == "has_config" then
-				vim.notify("pyproject.toml already has pyright config, skipping pyrightconfig.json", vim.log.levels.INFO)
+				vim.notify(
+					"pyproject.toml already has pyright config, skipping pyrightconfig.json",
+					vim.log.levels.INFO
+				)
 			elseif pyproject_status == "exists_no_config" then
 				vim.ui.select({ "Add to pyproject.toml", "Create pyrightconfig.json" }, {
 					prompt = "pyproject.toml exists. How to add basedpyright config?",
@@ -278,7 +291,10 @@ local function setup_monorepo()
 					if created > 0 then
 						vim.notify(string.format("Created/updated %d config file(s)", created), vim.log.levels.INFO)
 						vim.notify("\nNext steps:", vim.log.levels.INFO)
-						vim.notify("1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate", vim.log.levels.INFO)
+						vim.notify(
+							"1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate",
+							vim.log.levels.INFO
+						)
 						vim.notify("2. pip install django django-stubs[compatible-mypy] ruff", vim.log.levels.INFO)
 						vim.notify("3. Restart LSP: :LspRestart", vim.log.levels.INFO)
 					else
@@ -299,7 +315,10 @@ local function setup_monorepo()
 			if created > 0 then
 				vim.notify(string.format("Created %d config file(s)", created), vim.log.levels.INFO)
 				vim.notify("\nNext steps:", vim.log.levels.INFO)
-				vim.notify("1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate", vim.log.levels.INFO)
+				vim.notify(
+					"1. cd " .. folder_name .. " && python -m venv .venv && source .venv/bin/activate",
+					vim.log.levels.INFO
+				)
 				vim.notify("2. pip install django django-stubs[compatible-mypy] ruff", vim.log.levels.INFO)
 				vim.notify("3. Restart LSP: :LspRestart", vim.log.levels.INFO)
 			else
