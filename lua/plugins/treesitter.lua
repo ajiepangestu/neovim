@@ -17,11 +17,15 @@ return {
 				"c_sharp",
 				"css",
 				"diff",
+				"dockerfile",
 				"fsharp",
+				"graphql",
 				"html",
 				"htmldjango",
 				"javascript",
 				"jsdoc",
+				-- No "jsonc": nvim-treesitter has no such parser, and the jsonc
+				-- filetype already resolves to this one.
 				"json",
 				"lua",
 				"luadoc",
@@ -33,6 +37,7 @@ return {
 				"query",
 				"regex",
 				"scss",
+				"sql",
 				"toml",
 				"tsx",
 				"typescript",
@@ -122,7 +127,11 @@ return {
 								return vim.cmd("normal! " .. key)
 							end
 							require("nvim-treesitter-textobjects.move")[method](query, "textobjects")
-						end, { buffer = buf, silent = true, desc = (key:sub(1, 1) == "[" and "Prev " or "Next ") .. query })
+						end, {
+							buffer = buf,
+							silent = true,
+							desc = (key:sub(1, 1) == "[" and "Prev " or "Next ") .. query,
+						})
 					end
 				end
 			end
