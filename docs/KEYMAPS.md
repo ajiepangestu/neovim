@@ -159,6 +159,40 @@ vscode-js-debug for Node and Chrome. A project's own `.vscode/launch.json` is
 read on every `<leader>Dc`, so configurations defined there show up in the
 picker without being restated in this config.
 
+Each stack also has one configuration that attaches to a debugger **inside a
+container** — the launch configurations all start a process on this machine,
+which cannot reach an interpreter, a toolchain or a `node_modules` that only
+exists in the image:
+
+| Configuration | Start this in the container | Port |
+| ------------- | --------------------------- | ---- |
+| `Django: attach to debugpy in a container` | `python -m debugpy --listen 0.0.0.0:5678 --wait-for-client manage.py runserver 0.0.0.0:8000 --noreload` | 5678 |
+| `Next.js: attach to node in a container` | `NODE_OPTIONS='--inspect=0.0.0.0:9229' npm run dev` | 9229 |
+| `Fiber: attach to dlv in a container` | `dlv debug --headless --listen=:2345 --api-version=2 --accept-multiclient ./cmd/api` | 2345 |
+
+Bind to `0.0.0.0`, not the default loopback: `--inspect` and `--listen` on
+`127.0.0.1` bind the *container's* loopback, and the published port then
+reaches nothing.
+
+Each one asks for the host, the port and the path the project is mounted at
+(default `/app`) the first time it runs, then remembers all three for the rest
+of the session — `:DapRemoteReset` forgets them. That path is not cosmetic:
+without it a breakpoint is accepted and never hit, because this side names
+`~/project/app/views.py` and the debugger only knows `/app/app/views.py`.
+
+All three were verified end to end, not just wired up: the Python one against a
+real container publishing 5678, the Go one against a headless `dlv`, the Node
+one against `node --inspect` — each reaching `stopped at breakpoint` with the
+breakpoint bound through the path mapping.
+
+Python and Go connect **straight to the debugger's socket**; only Node goes
+through a locally spawned adapter, because a Node inspector speaks CDP rather
+than DAP and js-debug is what translates. Getting that wrong is silent: an
+`attach` with `connect = { host, port }` routed through a local
+`debugpy-adapter` makes the adapter open an ephemeral port of its own and wait
+for the debuggee to dial back, which nothing inside a container can do — the
+session simply never initializes, with no error and no timeout.
+
 | Key          | Mode | Action                         |
 | ------------ | ---- | ------------------------------ |
 | `<leader>Dc` | n    | Continue / start a session     |
@@ -173,6 +207,93 @@ picker without being restated in this config.
 | `<leader>Dr` | n    | Toggle the REPL                |
 | `<leader>Du` | n    | Toggle the debug UI (dap-ui)   |
 | `<leader>De` | n, v | Evaluate expression under cursor / selection |
+
+## Docker
+
+Under `<leader>k` — `kontainer`. `<leader>d` closes the buffer and `<leader>D`
+is the debug group, so neither letter was available.
+
+Dockerfiles and compose files have no keymaps of their own — they run like any
+other LSP and linter:
+
+| File | What is attached |
+| ---- | ---------------- |
+| `Dockerfile`, `Dockerfile.*`, `*.Dockerfile` | `dockerls` (completion, hover, formatting on save) and `hadolint` (unpinned `apt-get` versions, missing `--no-install-recommends`, deprecated instructions, plus shellcheck over the `RUN` bodies) |
+| `compose.y{a,}ml`, `docker-compose.y{a,}ml` and their `*.prod` / `*.override` overlays | `yamlls` with compose-spec.json from SchemaStore: 92 completion items at a service key, 9 at the document root, hover on every key, and schema validation (`environmnet:` is reported as not allowed) |
+
+Compose stays on the plain `yaml` filetype and needs nothing beyond that.
+`docker_compose_language_service` was tried and removed —
+`lua/plugins/docker.lua` records the measurements, the short version being that
+it contributed no completion and four code lenses that invoke VS Code extension
+commands nothing here can run.
+
+These keys are for the containers themselves.
+
+| Key          | Mode | Action                              |
+| ------------ | ---- | ----------------------------------- |
+| `<leader>kd` | n    | LazyDocker in a floating terminal   |
+| `<leader>kl` | n    | `docker compose logs -f` (last 200) |
+| `<leader>kp` | n    | `docker compose ps --all`           |
+
+## HTTP client (kulala)
+
+Under `<leader>h`. Requests live in a `.http` file next to the code, which is
+reviewable in git in a way a curl scrollback is not — one file serves Django
+REST viewsets, Fiber routes and Next.js route handlers alike.
+
+Variables come from a `http-client.env.json` beside the file; pick which
+environment they are read from with `<leader>he`.
+
+| Key          | Mode | Action                                    |
+| ------------ | ---- | ----------------------------------------- |
+| `<leader>hh` | n    | Send the request under the cursor         |
+| `<leader>ha` | n    | Send every request in the file            |
+| `<leader>hr` | n    | Replay the last request                   |
+| `<leader>hi` | n    | Inspect the request with variables filled in |
+| `<leader>ht` | n    | Toggle body / headers view                |
+| `<leader>hc` | n    | Copy the request as a `curl` command      |
+| `<leader>hp` | n    | Paste a `curl` command as a request       |
+| `<leader>he` | n    | Select the environment                    |
+| `<leader>hs` | n    | Open the scratchpad                       |
+| `]r` / `[r`  | n    | Next / previous request in the file       |
+
+`]r` and `[r`, not `]h` and `[h`: gitsigns owns those for hunks and its maps
+are buffer-local, so they would win in any `.http` file inside a git repo.
+
+## Database (dadbod)
+
+Under `<leader>a`. `d`, `D` and `b` are all taken (close buffer, debug, buffer
+group), so this one is simply the free key.
+
+Connections are stored by `:DBUIAddConnection` in `~/.local/share/db_ui`, not in
+this repo — the URLs carry passwords. `$DATABASE_URL` and `g:dbs` are picked up
+too.
+
+| Key          | Mode | Action                                |
+| ------------ | ---- | ------------------------------------- |
+| `<leader>au` | n    | Toggle the database UI                |
+| `<leader>af` | n    | Jump to the buffer for a connection   |
+| `<leader>ac` | n    | Add a connection                      |
+
+In a `.sql` buffer opened from the UI, blink.cmp gains a `dadbod` source that
+completes table and column names from the live connection, alongside the usual
+LSP/path/snippet/buffer sources.
+
+dadbod-ui installs three maps of its own, buffer-local to its buffers. They
+shadow global maps while you are in one, which is the right trade there — but
+worth knowing:
+
+| Key | In a dadbod buffer | Globally |
+| --- | ------------------ | -------- |
+| `<leader>S` | Execute the query | Select scratch buffer |
+| `<leader>W` | Save the query | Workspace group |
+| `<leader>E` | Edit bind parameters | — |
+| `<leader>R` | Toggle result layout (in the result buffer) | — |
+
+Saving does **not** execute. `g:db_ui_execute_on_save` is turned off: `:w` in
+this config already means format-on-save, `<C-s>` is mapped in insert mode, and
+a query buffer gets saved mid-edit — an `UPDATE` that ran because the buffer was
+written is not a thing to find out about afterwards. `<leader>S` runs it.
 
 ## Picker (snacks)
 
@@ -232,6 +353,7 @@ picker without being restated in this config.
 | `<leader>ui` | Inspect position (highlights)        |
 | `<leader>uA` | Toggle tabline                       |
 | `<leader>uT` | Toggle treesitter highlight          |
+| `<leader>um` | Toggle markdown render (in buffer)   |
 | `<leader>un` | Dismiss all notifications            |
 | `<leader>ur` | Redraw / clear hlsearch / diff update|
 

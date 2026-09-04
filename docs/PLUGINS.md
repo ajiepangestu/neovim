@@ -24,7 +24,7 @@
 |--------|-------------|
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter manager (see Formatters by Filetype below) |
 | [basedpyright](https://github.com/DetachHead/basedpyright) | Python LSP with Django ORM support (replaces pyright) |
-| [nvim-lint](https://github.com/mfussenegger/nvim-lint) | Linters the language servers do not cover: `djlint` for Django templates, `golangci-lint` for Go (on write only — it type-checks the whole package) |
+| [nvim-lint](https://github.com/mfussenegger/nvim-lint) | Linters the language servers do not cover: `djlint` for Django templates, `hadolint` for Dockerfiles, `golangci-lint` for Go and `mypy` for Python (the last two on write only — both check far more than the file). `mypy` additionally runs only where the project has a mypy config *and* a venv containing mypy, since outside the venv it has no `django-stubs` |
 | [neotest](https://github.com/nvim-neotest/neotest) | Test runner, keys under `<leader>N`. Adapters: [neotest-golang](https://github.com/fredrikaverpil/neotest-golang), [neotest-python](https://github.com/nvim-neotest/neotest-python), [neotest-vitest](https://github.com/marilari88/neotest-vitest), [neotest-jest](https://github.com/nvim-neotest/neotest-jest) |
 
 ### Formatters by Filetype
@@ -36,11 +36,18 @@
 | Go | `goimports` + `gofumpt` |
 | C# (.NET) | `csharpier` |
 | TypeScript, JavaScript, TSX, JSX, JSON | `biome` if the project has a `biome.json`, else `prettierd`, else `prettier` |
-| HTML, CSS, YAML, Markdown | `prettierd`, falling back to `prettier` |
+| HTML, CSS, YAML (compose files included), Markdown, MDX | `prettierd`, falling back to `prettier` |
 
 `prettierd` is prettier kept warm as a daemon (~0.07s per format against ~0.17s
 for `prettier`). Go templates living in `.html` files are excluded — see
 `is_go_template` in `lua/plugins/go.lua`.
+
+Dockerfiles have no conform entry on purpose: there is no maintained standalone
+Dockerfile formatter, and `dockerls` implements `textDocument/formatting`. With
+`lsp_format = "fallback"` in `default_format_opts`, conform hands the buffer to
+the server, so `<leader>cf` and format-on-save work there without one. It is
+configured with `ignoreMultilineInstructions`, which leaves the body of a
+`RUN … && \` chain exactly as written.
 
 ESLint's own auto-fixes are applied on save in buffers where the eslint server
 is attached, before prettier runs. `<leader>uf` / `<leader>uF` turn that off
@@ -61,6 +68,22 @@ Use `:MonorepoSetup` command to auto-generate config files.
 | Plugin | Description |
 |--------|-------------|
 | [nvim-emmet](https://github.com/olrtg/nvim-emmet) | Wrap selection with an emmet abbreviation (needs `emmet_language_server`) |
+| [render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) | In-buffer markdown preview: headings, tables, code blocks, callouts and checkboxes drawn over the raw text. No browser or extra runtime — it reuses the `markdown` / `markdown_inline` parsers. Toggle with `<leader>um`. Also covers `.mdx` |
+| [kulala.nvim](https://github.com/mistweaverco/kulala.nvim) | HTTP client: send the request under the cursor from a `.http` file and read the response in a split. Keys under `<leader>h` |
+| [vim-dadbod](https://github.com/tpope/vim-dadbod) | Database client (`:DB`) |
+| [vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui) | Drawer over dadbod: connections, tables, saved queries. Keys under `<leader>a` |
+| [vim-dadbod-completion](https://github.com/kristijanhusak/vim-dadbod-completion) | Table and column completion in SQL buffers, wired into blink.cmp as the `dadbod` source |
+
+### MDX
+
+`.mdx` has no filetype rule in Neovim, so those files used to fall through to
+`conf`: no useful highlighting, no prettier, and `render-markdown` never
+triggering — while `formatters_by_ft` and the render-markdown spec were already
+written against a `markdown.mdx` filetype that nothing produced.
+`lua/plugins/nextjs.lua` now registers it, maps it to the `markdown` parser, and
+`lua/config/autocmds.lua` lists it alongside `markdown` for wrap and spell (a
+FileType autocmd matches the filetype string whole, so `markdown` alone does not
+cover `markdown.mdx`).
 
 ## Git
 
@@ -123,6 +146,7 @@ Neovim's built-in `vim.lsp.enable`. Mason installs the binaries.
 | `html` | HTML tags, attributes, validation |
 | `cssls` | CSS / SCSS / LESS properties and colours |
 | `gopls` | Go (Fiber) |
+| `dockerls` | Dockerfile instructions, flags and formatting |
 | `omnisharp` | C# / .NET |
 | `fsautocomplete` | F# |
 
@@ -176,8 +200,18 @@ Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_F
 ## Mason Installed Tools
 
 Declared as `ensure_installed` across `lua/plugins/lsp.lua`, `django.lua`,
-`nextjs.lua`, `go.lua` and `lint.lua`, installed on first start. Duplicate
-requests are de-duplicated before install.
+`docker.lua`, `nextjs.lua`, `go.lua` and `lint.lua`, installed on first start.
+Duplicate requests are de-duplicated before install.
+
+Every one of those fragments repeats `opts_extend = { "ensure_installed" }`, and
+so do the `nvim-treesitter` fragments in the per-stack files. This is not
+redundancy. lazy merges fragments in file order and reads `opts_extend` from the
+fragment currently being merged or an *earlier* one, so declaring it only on the
+spec that owns the plugin covers just the fragments that sort after it —
+`lsp.lua` and `treesitter.lua` are both late in the alphabet, so most stack
+files fall before them. A plain `ensure_installed` table at that point in the
+chain **replaces** everything the earlier files asked for rather than adding to
+it, and nothing reports the loss: the packages simply never install.
 
 | Tool | Purpose |
 |------|---------|
@@ -196,6 +230,8 @@ requests are de-duplicated before install.
 | `omnisharp` / `fsautocomplete` | C# / F# LSP |
 | `prettier`, `prettierd` | Prettier formatter, and its daemon |
 | `golangci-lint` | Go linter (errcheck, unused, …) |
+| `dockerfile-language-server` | Dockerfile LSP (`docker-langserver`) |
+| `hadolint` | Dockerfile linter, with shellcheck over `RUN` bodies |
 | `gomodifytags` | Add/remove struct tags (`:GoTagAdd`) |
 | `gotests` | Generate table-driven tests (`:GoTests`) |
 | `csharpier`, `fantomas` | C# / F# formatters |
@@ -204,11 +240,23 @@ requests are de-duplicated before install.
 ## Treesitter Parsers
 
 Installed automatically on first start, see `ensure_installed` in
-`lua/plugins/treesitter.lua` plus the per-stack files — 33 in total: bash, c,
-c_sharp, css, diff, fsharp, go, gomod, gosum, gotmpl, gowork, html, htmldjango,
-javascript, jsdoc, json, lua, luadoc, luap, markdown, markdown_inline, printf,
-python, query, regex, scss, toml, tsx, typescript, vim, vimdoc, xml, yaml.
+`lua/plugins/treesitter.lua` plus the per-stack files — 38 in total: bash, c,
+c_sharp, css, diff, dockerfile, fsharp, gitignore, go, gomod, gosum, gotmpl,
+gowork, graphql, html, htmldjango, http, javascript, jsdoc, json, lua, luadoc,
+luap, markdown, markdown_inline, printf, python, query, regex, scss, sql, toml,
+tsx, typescript, vim, vimdoc, xml, yaml.
 
 `dtd` also appears in `:checkhealth vim.treesitter`; it is pulled in as a
 dependency of the xml parser rather than requested here. There is no `jsonc`
-parser — jsonc files are highlighted by the `json` one.
+parser — jsonc files are highlighted by the `json` one, and no `env` parser
+either: `.env` falls back to Neovim's own `syntax/env.vim`, which is why it is
+the one filetype here without treesitter highlighting.
+
+Two filetypes borrow another language's parser through
+`vim.treesitter.language.register`, because a compound or renamed filetype has
+no parser of its own: `gohtmltmpl` → `gotmpl` (`lua/plugins/go.lua`) and
+`markdown.mdx` → `markdown` (`lua/plugins/nextjs.lua`). Without that the
+FileType hook in `treesitter.lua` sees `get_lang()` return nil and never starts
+highlighting. Each of those filetypes also needs its own entry wherever the
+config matches a filetype exactly — `formatters_by_ft` in `formatting.lua` and
+the FileType autocmds in `autocmds.lua` — since neither does dot-splitting.

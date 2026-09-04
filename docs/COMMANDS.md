@@ -24,6 +24,22 @@
 | `:DjangoInstall` | Install Django dependencies with virtualenv safety checks |
 | `:VenvStatus` | Check if virtualenv is currently active |
 | `:LspEslintFixAll` | Apply every ESLint auto-fix in the buffer (also runs on save) |
+| `:MypyRescan` | Re-detect the project's mypy configuration after adding one |
+
+## Debugging
+
+| Command | Description |
+|---------|-------------|
+| `:DapRemoteReset` | Forget the remembered host, port and container path used by the "attach to … in a container" configurations |
+
+## Database (dadbod)
+
+| Command | Description |
+|---------|-------------|
+| `:DBUIToggle` | Toggle the database drawer (`<leader>au`) |
+| `:DBUIAddConnection` | Store a connection URL in `~/.local/share/db_ui` |
+| `:DBUIFindBuffer` | Jump to the buffer for a connection |
+| `:DB <url> <query>` | Run one query without the UI |
 
 ## Go
 

@@ -32,9 +32,16 @@ lua/plugins/                 one file per context, each returns a lazy.nvim spec
   formatting.lua             conform.nvim and format on save
   search.lua                 spectre search & replace
   opencode.lua               opencode AI integration
-  django.lua                 Django: basedpyright/ruff/djls, djlint, venv-selector
-  nextjs.lua                 Next.js: vtsls/eslint keymaps, emmet server, parsers
+  django.lua                 Django: basedpyright/ruff/djls, djlint, mypy, venv-selector
+  nextjs.lua                 Next.js: vtsls/eslint keymaps, emmet server, mdx filetype
   go.lua                     Go + Fiber: gopls, gofumpt/goimports, gotmpl templates
+  docker.lua                 Docker: dockerls, hadolint, lazydocker/compose terminals
+  database.lua               dadbod + dadbod-ui, SQL completion from the live connection
+  http.lua                   kulala: send .http requests from the buffer
+  markdown.lua               render-markdown in-buffer preview
+  lint.lua                   nvim-lint wiring shared by the stack files
+  dap.lua                    nvim-dap core, dap-ui, mason-nvim-dap
+  test.lua                   neotest core (adapters live with their stack)
 ```
 
 Each `lua/plugins/*.lua` file is one **context**, not one plugin: everything that
@@ -60,6 +67,9 @@ formatters to `conform.nvim`; lazy.nvim merges those fragments.
 
 - Django: [DJANGO_SETUP.md](./DJANGO_SETUP.md), monorepo layout in [MONOREPO_SETUP.md](./MONOREPO_SETUP.md)
 - Go / Fiber: [GO_FIBER.md](./GO_FIBER.md)
+- Debugging any of them inside a container: the Debug section of
+  [KEYMAPS.md](./KEYMAPS.md) — one attach configuration per stack, and what to
+  start on the container side.
 
 ## Adding a language
 
@@ -67,3 +77,8 @@ formatters to `conform.nvim`; lazy.nvim merges those fragments.
 2. Add the server to `opts.servers` in `lua/plugins/lsp.lua` (the key is the
    `nvim-lspconfig` server name) and its Mason package to `ensure_installed`.
 3. Add a formatter to `formatters_by_ft` in `lua/plugins/formatting.lua`.
+
+If instead you give the language its own stack file, every fragment in it that
+adds to `ensure_installed` must also carry `opts_extend = { "ensure_installed" }`
+— see the note under *Mason Installed Tools* in [PLUGINS.md](./PLUGINS.md).
+Without it the list is replaced rather than extended, silently.
