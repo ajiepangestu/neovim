@@ -290,6 +290,68 @@ return {
 		end,
 	},
 
+	-- Debugging a Fiber app that runs inside a container. mason-nvim-dap's
+	-- configurations all start delve locally, which cannot work when the binary,
+	-- its GOPATH and its source paths live in the image.
+	--
+	-- In the container, run the target under a headless delve:
+	--
+	--   dlv debug --headless --listen=:2345 --api-version=2 \
+	--     --accept-multiclient ./cmd/api
+	--
+	-- and publish 2345. `--accept-multiclient` is what lets you detach and
+	-- reattach without restarting the process; without it the first disconnect
+	-- kills the server.
+	{
+		"mfussenegger/nvim-dap",
+		optional = true,
+		opts = function()
+			local dap = require("dap")
+			local Util = require("config.util")
+
+			-- A separate adapter name rather than wrapping `dap.adapters.delve`:
+			-- mason-nvim-dap registers that one when the delve package finishes
+			-- installing, which is asynchronous and may land after this runs.
+			-- Replacing it here would either be overwritten or overwrite it,
+			-- depending on the order -- and that order is not ours to control.
+			dap.adapters["delve-remote"] = function(callback, config)
+				callback({
+					type = "server",
+					host = config.host or "127.0.0.1",
+					port = config.port or 2345,
+				})
+			end
+
+			dap.configurations.go = vim.list_extend(dap.configurations.go or {}, {
+				{
+					type = "delve-remote",
+					request = "attach",
+					-- `remote`, not `local`: the server is already debugging the
+					-- target, so nvim-dap must not send a launch request.
+					mode = "remote",
+					name = "Fiber: attach to dlv in a container",
+					host = function()
+						return Util.dap_input("go_remote_host", "dlv host: ", "127.0.0.1")
+					end,
+					port = function()
+						return tonumber(Util.dap_input("go_remote_port", "dlv port: ", "2345"))
+					end,
+					-- Without this every breakpoint is silently ignored: nvim-dap
+					-- sends the path on this machine, delve compares it against the
+					-- path compiled into the binary, and they never match.
+					substitutePath = {
+						{
+							from = "${workspaceFolder}",
+							to = function()
+								return Util.dap_input("go_remote_root", "Module path inside the container: ", "/app")
+							end,
+						},
+					},
+				},
+			})
+		end,
+	},
+
 	-- Test running with neotest. neotest-golang shells out to `go test -json`,
 	-- so it needs no extra tooling, and its `dap` strategy reuses the delve
 	-- installed above for <leader>Nd.

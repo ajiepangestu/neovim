@@ -164,6 +164,15 @@ return {
 				)
 			end
 
+			-- The remote configurations in plugins/{go,django,nextjs}.lua ask for
+			-- the container's port and source root once and then remember the
+			-- answers, so switching to a different project mid-session needs a way
+			-- to forget them.
+			vim.api.nvim_create_user_command("DapRemoteReset", function()
+				require("config.util").dap_input_reset()
+				vim.notify("Remote debug targets cleared", vim.log.levels.INFO)
+			end, { desc = "Forget the remembered remote debug host/port/path" })
+
 			-- `.vscode/launch.json` needs no wiring here. nvim-dap registers a
 			-- `dap.launch.json` config provider that re-reads it on every
 			-- `continue()`, and its decoder already passes skip_comments to

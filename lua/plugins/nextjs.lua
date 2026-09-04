@@ -136,6 +136,41 @@ return {
 						webRoot = "${workspaceFolder}",
 						sourceMaps = true,
 					},
+					-- The container case. "Launch file" and "debug server side" both
+					-- start node on this machine; neither can reach a dev server whose
+					-- node_modules only exist in the image.
+					--
+					-- In the container, expose the inspector on every interface --
+					-- `--inspect` alone binds 127.0.0.1, which is the container's
+					-- loopback, not yours, and the port publish then goes nowhere:
+					--
+					--   NODE_OPTIONS='--inspect=0.0.0.0:9229' npm run dev
+					--
+					-- and publish 9229.
+					{
+						type = "pwa-node",
+						request = "attach",
+						name = "Next.js: attach to node in a container",
+						address = function()
+							return Util.dap_input("node_remote_host", "node inspector host: ", "127.0.0.1")
+						end,
+						port = function()
+							return tonumber(Util.dap_input("node_remote_port", "node inspector port: ", "9229"))
+						end,
+						cwd = "${workspaceFolder}",
+						localRoot = "${workspaceFolder}",
+						-- Same reason as the go and python remote configurations: the
+						-- paths in the source maps are the container's, and a breakpoint
+						-- set against a host path binds to nothing without this.
+						remoteRoot = function()
+							return Util.dap_input("node_remote_root", "Project path inside the container: ", "/app")
+						end,
+						sourceMaps = true,
+						skipFiles = { "<node_internals>/**", "**/node_modules/**" },
+						-- The dev server restarts on config changes; without this the
+						-- session dies with it instead of picking the process back up.
+						restart = true,
+					},
 				})
 			end
 		end,

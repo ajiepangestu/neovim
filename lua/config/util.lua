@@ -163,6 +163,37 @@ function M.python_path(root)
 end
 
 --------------------------------------------------------------------------------
+-- Debugging
+--------------------------------------------------------------------------------
+
+local dap_inputs = {} ---@type table<string, string>
+
+---Ask for a value a DAP configuration needs, once per Neovim session.
+---
+---Remote debugging needs two things this config cannot guess: which port the
+---debugger inside the container listens on, and where the source tree is
+---mounted there. Both are stable for a given project and neither is stable
+---across projects, so a plain `vim.fn.input` in the configuration would ask the
+---same question before every single session. The answer is remembered instead,
+---and `:DapRemoteReset` (plugins/dap.lua) forgets it.
+---@param key string identifies the question, not the answer
+---@param prompt string
+---@param default string offered as editable text, and used for an empty answer
+---@return string
+function M.dap_input(key, prompt, default)
+	if dap_inputs[key] == nil then
+		local answer = vim.fn.input(prompt, default)
+		dap_inputs[key] = answer ~= "" and answer or default
+	end
+	return dap_inputs[key]
+end
+
+---Forget every remembered answer.
+function M.dap_input_reset()
+	dap_inputs = {}
+end
+
+--------------------------------------------------------------------------------
 -- Treesitter
 --------------------------------------------------------------------------------
 

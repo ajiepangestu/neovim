@@ -171,6 +171,30 @@ return {
 		-- plugin's own config(), which is all this needs.
 		opts = function()
 			local dap = require("dap")
+
+			-- A separate adapter for the remote case, for the same reason as
+			-- `delve-remote` in plugins/go.lua: mason-nvim-dap owns
+			-- `dap.adapters.python` and registers it asynchronously once debugpy
+			-- finishes installing, so replacing it here would race.
+			--
+			-- It has to be a plain socket connection, NOT the executable adapter
+			-- mason registers. `python -m debugpy --listen` already runs debugpy's
+			-- own adapter inside the container and speaks DAP on that port, so
+			-- there is nothing left for a second adapter to do. Sending the usual
+			-- `attach` + `connect = { host, port }` through a locally spawned
+			-- debugpy-adapter *looks* right and hangs: measured against a container
+			-- publishing 5678, the local adapter opens an ephemeral port of its own,
+			-- emits `debugpyWaitingForServer` for it and waits for the debuggee to
+			-- dial back -- which a process inside a container cannot do. No error,
+			-- no timeout, just a session that never initializes.
+			dap.adapters["debugpy-remote"] = function(callback, config)
+				callback({
+					type = "server",
+					host = config.host or "127.0.0.1",
+					port = config.port or 5678,
+				})
+			end
+
 			dap.configurations.python = vim.list_extend(dap.configurations.python or {}, {
 				{
 					type = "python",
@@ -203,6 +227,48 @@ return {
 					django = true,
 					console = "integratedTerminal",
 					pythonPath = Util.python_path,
+				},
+				-- The container case. Every configuration above starts a python on
+				-- this machine, which cannot work when the interpreter, the
+				-- installed packages and the source paths are all inside the image.
+				--
+				-- In the container:
+				--
+				--   pip install debugpy
+				--   python -m debugpy --listen 0.0.0.0:5678 --wait-for-client \
+				--     manage.py runserver 0.0.0.0:8000 --noreload
+				--
+				-- and publish 5678. `--noreload` for the same reason as above: the
+				-- autoreloader forks and the debugger keeps the parent.
+				--
+				-- No `pythonPath` here -- attaching does not start an interpreter,
+				-- the one in the container is already running.
+				{
+					type = "debugpy-remote",
+					request = "attach",
+					name = "Django: attach to debugpy in a container",
+					host = function()
+						return Util.dap_input("py_remote_host", "debugpy host: ", "127.0.0.1")
+					end,
+					port = function()
+						return tonumber(Util.dap_input("py_remote_port", "debugpy port: ", "5678"))
+					end,
+					-- Without this a breakpoint is accepted and never hit: this side
+					-- talks about /home/you/project/app/views.py and debugpy only
+					-- knows /app/app/views.py.
+					pathMappings = {
+						{
+							localRoot = "${workspaceFolder}",
+							remoteRoot = function()
+								return Util.dap_input("py_remote_root", "Project path inside the container: ", "/app")
+							end,
+						},
+					},
+					django = true,
+					-- Step into Django itself, not just your own code. When a request
+					-- dies somewhere in the middleware chain or in the ORM, that is
+					-- exactly where the frame you need is.
+					justMyCode = false,
 				},
 			})
 		end,
