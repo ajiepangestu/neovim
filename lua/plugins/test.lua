@@ -83,6 +83,12 @@ return {
 
 	{
 		"folke/which-key.nvim",
+		-- Same reason as the `ensure_installed` fragments: `opts_extend` is read
+		-- from the fragment being merged or an earlier one, and the which-key spec
+		-- that declares it lives in plugins/editor.lua. Files sorting before that
+		-- would otherwise REPLACE the group list instead of adding to it -- which
+		-- is exactly how `<leader>D` lost its "debug" label.
+		opts_extend = { "spec" },
 		opts = { spec = { { "<leader>N", group = "test" } } },
 	},
 }

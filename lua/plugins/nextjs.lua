@@ -53,6 +53,14 @@ return {
 	-- ESLint for JS/TS (prettier itself is installed in plugins/lsp.lua)
 	{
 		"mason-org/mason.nvim",
+		-- `opts_extend` has to be repeated on every fragment that adds to the
+		-- list, not just on the one that owns the plugin. lazy merges fragments
+		-- in file order and reads `opts_extend` from the fragment being merged
+		-- (or an EARLIER one); the owning spec here is alphabetically last, so at
+		-- this point in the chain it is not visible yet and a plain table would
+		-- REPLACE everything the files before it contributed instead of adding
+		-- to it. Silently: nothing errors, the packages simply never install.
+		opts_extend = { "ensure_installed" },
 		opts = { ensure_installed = { "eslint-lsp", "emmet-language-server" } },
 	},
 
