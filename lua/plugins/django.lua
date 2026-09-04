@@ -1,5 +1,74 @@
 local Util = require("config.util")
 
+--------------------------------------------------------------------------------
+-- mypy
+--
+-- basedpyright already type-checks, but it cannot read django-stubs: the Django
+-- plugin that turns `models.CharField()` into `str` on the instance is a *mypy*
+-- plugin, and only mypy loads it. `:DjangoInstall` (lua/config/django.lua) has
+-- always offered django-stubs[compatible-mypy] and nothing ever ran it.
+--
+-- Both gates below have to pass before mypy runs at all, because an ungated
+-- mypy is worse than no mypy: it is slow, and in a project that has not adopted
+-- it every unannotated function turns into a wall of diagnostics.
+--------------------------------------------------------------------------------
+
+---mypy from the project venv, or from the one venv-selector activated. NOT from
+---mason or $PATH: a mypy outside the venv has no django-stubs, so it would fail
+---on the very `plugins = ["mypy_django_plugin.main"]` line that makes it worth
+---running, and fail on every save.
+---@param root string
+---@return string?
+local function venv_mypy(root)
+	local venv = vim.env.VIRTUAL_ENV
+	if venv and venv ~= "" and vim.uv.fs_stat(venv .. "/bin/mypy") then
+		return venv .. "/bin/mypy"
+	end
+	for _, dir in ipairs({ ".venv", "venv", "env" }) do
+		local exe = root .. "/" .. dir .. "/bin/mypy"
+		if vim.uv.fs_stat(exe) then
+			return exe
+		end
+	end
+end
+
+local mypy_config_cache = {} ---@type table<string, string|false>
+
+---The project's mypy configuration, in the order mypy itself looks for one.
+---Passed explicitly with --config-file rather than left to discovery, because
+---nvim-lint runs the linter in Neovim's cwd, which in a monorepo is not the
+---directory holding the config.
+---@param root string
+---@return string?
+local function mypy_config(root)
+	if mypy_config_cache[root] == nil then
+		mypy_config_cache[root] = false
+		for file, section in pairs({
+			["mypy.ini"] = false,
+			[".mypy.ini"] = false,
+			["pyproject.toml"] = "[tool.mypy]",
+			["setup.cfg"] = "[mypy]",
+		}) do
+			local path = root .. "/" .. file
+			if vim.uv.fs_stat(path) then
+				-- pyproject.toml and setup.cfg exist in nearly every python
+				-- project; only their mypy section means mypy is wanted here.
+				if not section or table.concat(vim.fn.readfile(path), "\n"):find(section, 1, true) then
+					mypy_config_cache[root] = path
+					break
+				end
+			end
+		end
+	end
+	return mypy_config_cache[root] or nil
+end
+
+---Forget the cache, for when a config is added to a project mid-session.
+vim.api.nvim_create_user_command("MypyRescan", function()
+	mypy_config_cache = {}
+	vim.notify("mypy config cache cleared", vim.log.levels.INFO)
+end, { desc = "Re-detect the project's mypy configuration" })
+
 return {
 	-- Django tooling: djlint formatter and djls LSP
 	{
@@ -157,6 +226,41 @@ return {
 					-- when the project has it and falls back to unittest, which is
 					-- what a Django project without pytest-django wants.
 					dap = { justMyCode = false },
+				},
+			},
+		},
+	},
+
+	-- Type checking with django-stubs. Write-only: mypy re-checks the whole
+	-- import graph, which takes seconds even warm, so running it on InsertLeave
+	-- like ruff would make typing stutter for a result that cannot change until
+	-- the file is saved anyway.
+	{
+		"mfussenegger/nvim-lint",
+		opts = {
+			linters_by_ft = { python = { "mypy" } },
+			events_by_linter = { mypy = { "BufWritePost" } },
+			linters = {
+				mypy = {
+					cmd = function()
+						return venv_mypy(Util.root())
+					end,
+					condition = function()
+						local root = Util.root()
+						return venv_mypy(root) ~= nil and mypy_config(root) ~= nil
+					end,
+					prepend_args = {
+						"--config-file",
+						function()
+							return mypy_config(Util.root())
+						end,
+						-- Share the cache the command line uses instead of dropping a
+						-- second .mypy_cache wherever Neovim happens to be cd'd to.
+						"--cache-dir",
+						function()
+							return Util.root() .. "/.mypy_cache"
+						end,
+					},
 				},
 			},
 		},
