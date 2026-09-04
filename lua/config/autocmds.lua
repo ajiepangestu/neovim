@@ -91,10 +91,15 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Wrap and spell check in text filetypes
+-- Wrap and spell check in text filetypes.
+--
+-- `markdown.mdx` has to be listed separately. A FileType autocmd matches the
+-- filetype string whole -- Vim's dot-splitting applies to sourcing ftplugin and
+-- syntax files, not to autocmd patterns -- so the `markdown` entry alone does
+-- not cover it. (The filetype itself is registered in plugins/nextjs.lua.)
 vim.api.nvim_create_autocmd("FileType", {
 	group = augroup("wrap_spell"),
-	pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
+	pattern = { "text", "plaintex", "typst", "gitcommit", "markdown", "markdown.mdx" },
 	callback = function()
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true

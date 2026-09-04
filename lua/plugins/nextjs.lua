@@ -1,3 +1,22 @@
+local Util = require("config.util")
+
+-- MDX. Neovim has no rule for `.mdx`, so those files were falling through to
+-- the `conf` filetype: no highlighting worth the name, no prettier, and the
+-- render-markdown spec in plugins/markdown.lua never triggering -- while three
+-- places in this config were already written against a `markdown.mdx` filetype
+-- that nothing ever produced (`formatters_by_ft` in plugins/formatting.lua, and
+-- `ft` / `file_types` in plugins/markdown.lua).
+--
+-- It lives here because MDX is a Next.js concern in this config: content
+-- collections and doc pages under `app/`.
+vim.filetype.add({ extension = { mdx = "markdown.mdx" } })
+-- Same reason as `gohtmltmpl` in plugins/go.lua: a compound filetype has no
+-- parser of its own, and `vim.treesitter.language.get_lang` returning nil is
+-- what the FileType hook in plugins/treesitter.lua checks before starting
+-- highlighting. Markdown, not tsx: the file is markdown with JSX embedded in
+-- it, and the markdown parser is the one that gets the structure right.
+vim.treesitter.language.register("markdown", "markdown.mdx")
+
 ---Run a TypeScript source action (add missing imports, fix all, ...)
 ---@param kind string
 local function ts_action(kind)
