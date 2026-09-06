@@ -1,5 +1,32 @@
 local Util = require("config.util")
 
+-- Dotfiles are part of a project, so every picker shows them. `.env*` files go a
+-- step further: they're almost always gitignored, but still ours to open and grep,
+-- so each source that respects .gitignore gets a second pass just for them.
+local env_globs = { ".env", ".env.*" }
+
+---`rg` args that restrict a search to env files only.
+local function env_args()
+	local args = {}
+	for _, glob in ipairs(env_globs) do
+		vim.list_extend(args, { "-g", glob })
+	end
+	return args
+end
+
+---Drop items an earlier finder in a `multi` source already produced.
+---@param item snacks.picker.finder.Item
+---@param ctx snacks.picker.finder.ctx
+local function unique_match(item, ctx)
+	ctx.meta.seen = ctx.meta.seen or {}
+	local pos = item.pos or {}
+	local key = ("%s:%s:%s"):format(item.file or item.text or "", pos[1] or 0, pos[2] or 0)
+	if ctx.meta.seen[key] then
+		return false
+	end
+	ctx.meta.seen[key] = true
+end
+
 ---Terminal window navigation: <C-hjkl> moves between splits unless floating.
 local function term_nav(dir)
 	---@param self snacks.terminal
@@ -40,6 +67,37 @@ return {
 			},
 
 			picker = {
+				hidden = true, -- show dotfiles
+				ignored = false, -- but keep honouring .gitignore
+
+				sources = {
+					-- A source can't list itself in `multi`, so the plain passes live
+					-- under their own names and `files`/`grep` only combine them.
+					-- `finder = false` is what hands a source over to `multi`.
+					files = {
+						hidden = true, -- `files` defaults to false and wins over its sub-sources
+						finder = false,
+						multi = { "project_files", "env_files" },
+						transform = "unique_file",
+					},
+					grep = {
+						finder = false,
+						multi = { "project_grep", "env_grep" },
+						transform = unique_match,
+					},
+					explorer = { include = { "**/.env", "**/.env.*" } },
+					-- `smart` multis over "files", which no longer has a finder of its own
+					smart = { multi = { "buffers", "recent", "project_files", "env_files" } },
+
+					project_files = { finder = "files", format = "file" },
+					project_grep = { finder = "grep", format = "file" },
+
+					-- Extra passes that look *only* at env files. A positive `-g` glob
+					-- makes rg override .gitignore, which is the whole point here.
+					env_files = { finder = "files", format = "file", cmd = "rg", args = env_args() },
+					env_grep = { finder = "grep", format = "file", glob = env_globs },
+				},
+
 				win = {
 					input = {
 						keys = {
