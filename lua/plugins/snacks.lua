@@ -89,13 +89,13 @@ return {
 					-- `smart` multis over "files", which no longer has a finder of its own
 					smart = { multi = { "buffers", "recent", "project_files", "env_files" } },
 
-					project_files = { finder = "files", format = "file" },
-					project_grep = { finder = "grep", format = "file" },
+					project_files = { finder = "files" },
+					project_grep = { finder = "grep" },
 
 					-- Extra passes that look *only* at env files. A positive `-g` glob
 					-- makes rg override .gitignore, which is the whole point here.
-					env_files = { finder = "files", format = "file", cmd = "rg", args = env_args() },
-					env_grep = { finder = "grep", format = "file", glob = env_globs },
+					env_files = { finder = "files", cmd = "rg", args = env_args() },
+					env_grep = { finder = "grep", glob = env_globs },
 				},
 
 				win = {
