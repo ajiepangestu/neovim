@@ -94,6 +94,11 @@ return {
 				-- djls also claims plain `html`, so pin it to real Django projects.
 				-- Without this it attaches to any html file (e.g. Go templates).
 				djls = {
+					-- UTF-16 for the same reason as ruff in plugins/lsp.lua: djls
+					-- picks UTF-8 when offered it, and shares both python buffers (with
+					-- basedpyright) and Django templates (with html, emmet and tailwind),
+					-- all of which speak UTF-16.
+					capabilities = { general = { positionEncodings = { "utf-16" } } },
 					workspace_required = true,
 					root_dir = function(bufnr, on_dir)
 						local root = vim.fs.root(bufnr, { "manage.py" })

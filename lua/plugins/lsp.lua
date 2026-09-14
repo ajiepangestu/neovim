@@ -129,6 +129,16 @@ return {
 				},
 				-- Python: basedpyright for types, ruff for lint/fixes (see plugins/django.lua)
 				ruff = {
+					-- Pinned to UTF-16. basedpyright never negotiates a position
+					-- encoding -- it ignores `positionEncodings` and always speaks the
+					-- LSP default, UTF-16 -- while ruff takes the first entry Neovim
+					-- offers, which is UTF-8. Both attach to every python buffer, so
+					-- `:checkhealth vim.lsp` reported "buffers attached to multiple
+					-- clients with different position encodings", listing basedpyright
+					-- as the odd one out. Offering ruff only UTF-16 is the side that can
+					-- move. (Neovim converts per client, so nothing was visibly broken;
+					-- the columns only disagree on lines with multi-byte characters.)
+					capabilities = { general = { positionEncodings = { "utf-16" } } },
 					cmd_env = { RUFF_TRACE = "messages" },
 					init_options = { settings = { logLevel = "error" } },
 				},
