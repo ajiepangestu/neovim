@@ -1,23 +1,5 @@
--- Everything git: blame, diff, hunks and lazygit.
+-- Everything git: diff, hunks and gitsigns (LazyGit is in plugins/snacks.lua).
 return {
-	-- Inline git blame (like GitLens current line blame)
-	{
-		"f-person/git-blame.nvim",
-		event = "VeryLazy",
-		opts = {
-			enabled = true,
-			message_template = " <summary> • <date> • <author> • <<sha>>",
-			date_format = "%Y-%m-%d %H:%M:%S",
-			virtual_text_column = 1,
-		},
-		keys = {
-			{ "<leader>gb", "<cmd>GitBlameToggle<cr>", desc = "Toggle git blame" },
-			{ "<leader>go", "<cmd>GitBlameOpenCommitURL<cr>", desc = "Open commit URL" },
-			{ "<leader>gc", "<cmd>GitBlameCopyCommitURL<cr>", desc = "Copy commit URL" },
-			{ "<leader>gf", "<cmd>GitBlameCopyFileURL<cr>", desc = "Copy file URL" },
-		},
-	},
-
 	-- Enhanced diff viewer for git changes
 	{
 		"sindrets/diffview.nvim",
@@ -35,20 +17,15 @@ return {
 		},
 	},
 
-	-- LazyGit in a floating terminal
-	{
-		-- LazyGit integration: <leader>gg
-		"kdheepak/lazygit.nvim",
-		cmd = { "LazyGit", "LazyGitConfig", "LazyGitCurrentFile", "LazyGitFilter", "LazyGitFilterCurrentFile" },
-		dependencies = { "nvim-lua/plenary.nvim" },
-		keys = { { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" } },
-	},
-
-	-- Git gutter signs and hunk actions
+	-- Git gutter signs, hunk actions, and line blame
 	{
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
+			current_line_blame = true,
+			current_line_blame_opts = {
+				delay = 300,
+			},
 			signs = {
 				add = { text = "▎" },
 				change = { text = "▎" },
@@ -80,6 +57,7 @@ return {
 				end, "Prev hunk")
 				map("n", "]H", function() gs.nav_hunk("last") end, "Last hunk")
 				map("n", "[H", function() gs.nav_hunk("first") end, "First hunk")
+				map("n", "<leader>gb", gs.toggle_current_line_blame, "Toggle git blame line")
 				map({ "n", "x" }, "<leader>ghs", ":Gitsigns stage_hunk<CR>", "Stage hunk")
 				map({ "n", "x" }, "<leader>ghr", ":Gitsigns reset_hunk<CR>", "Reset hunk")
 				map("n", "<leader>ghS", gs.stage_buffer, "Stage buffer")

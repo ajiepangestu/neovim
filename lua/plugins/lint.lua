@@ -126,9 +126,7 @@ return {
 		"mason-org/mason.nvim",
 		opts = function(_, opts)
 			opts.ensure_installed = opts.ensure_installed or {}
-			-- djlint is already requested by plugins/django.lua for formatting;
-			-- listed here too so this file works on its own if django.lua is removed.
-			vim.list_extend(opts.ensure_installed, { "djlint", "golangci-lint" })
+			vim.list_extend(opts.ensure_installed, { "golangci-lint" })
 		end,
 	},
 }

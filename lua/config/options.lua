@@ -35,7 +35,7 @@ opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "glob
 
 -- UI
 opt.cursorline = true
-opt.guifont = "Iosevka Nerd Font Mono:h11"
+opt.guifont = "JetBrainsMono Nerd Font Mono:h11"
 opt.laststatus = 3 -- global statusline
 opt.list = true
 opt.number = true

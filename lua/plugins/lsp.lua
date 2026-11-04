@@ -19,7 +19,6 @@ return {
 				"json-lsp",
 				"yaml-language-server",
 				"omnisharp",
-				"fsautocomplete",
 				-- tools
 				"stylua",
 				"shfmt",
@@ -27,11 +26,15 @@ return {
 				"prettier",
 				"prettierd",
 				"csharpier",
-				"fantomas",
 			},
 		},
 		config = function(_, opts)
 			require("mason").setup(opts)
+
+			-- Don't trigger background downloads when running headless (scripts / tests)
+			if #vim.api.nvim_list_uis() == 0 then
+				return
+			end
 
 			local registry = require("mason-registry")
 			registry.refresh(function()
@@ -244,18 +247,12 @@ return {
 						less = { lint = { unknownAtRules = "ignore" } },
 					},
 				},
-				-- .NET
+				-- C# (.NET)
 				omnisharp = {
-					handlers = {
-						["textDocument/definition"] = function(...)
-							return require("omnisharp_extended").handler(...)
-						end,
-					},
 					enable_roslyn_analyzers = true,
 					organize_imports_on_format = true,
 					enable_import_completion = true,
 				},
-				fsautocomplete = {},
 			},
 
 			-- Per-server hooks, run before the server is enabled.

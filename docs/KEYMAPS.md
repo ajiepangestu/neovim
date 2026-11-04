@@ -98,8 +98,6 @@ straight there, several results open a list with a preview (like VS Code).
 | `E`          | n    | Show diagnostic float     |
 | `]d`         | n    | Next diagnostic           |
 | `[d`         | n    | Previous diagnostic       |
-| `<leader>le` | n    | Buffer diagnostics picker |
-| `<leader>lE` | n    | All diagnostics picker    |
 | `<leader>li` | n    | LSP info (checkhealth)    |
 | `<leader>cl` | n    | Run code lens (servers that provide one, e.g. gopls on go.mod / tests) |
 | `<leader>cv` | n    | Select Python virtualenv  |
@@ -299,17 +297,14 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 
 | Key                | Mode | Action                          |
 | ------------------ | ---- | ------------------------------- |
-| `<leader><space>`  | n    | Find files (root dir)           |
-| `<leader>/`        | n    | Grep (root dir)                 |
-| `<leader>,`        | n    | Buffers                         |
-| `<leader>:`        | n    | Command history                 |
-| `<leader>n`        | n    | Notification history            |
 | `<leader>ff` / `fF`| n    | Find files (root dir / cwd)     |
-| `<leader>fg`       | n    | Find files (git-files)          |
+| `<leader>fg`       | n, x | Find text / grep (root dir)     |
+| `<leader>fb`       | n    | Buffers                         |
 | `<leader>fr` / `fR`| n    | Recent files (all / cwd)        |
 | `<leader>fc`       | n    | Find config file                |
 | `<leader>fe` / `fE`| n    | Explorer (root dir / cwd)       |
 | `<leader>sb`       | n    | Buffer lines                    |
+| `<leader>sB`       | n    | Grep open buffers               |
 | `<leader>sd` / `sD`| n    | Diagnostics (all / buffer)      |
 | `<leader>sh`       | n    | Help pages                      |
 | `<leader>sk`       | n    | Keymaps                         |
@@ -317,7 +312,6 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>su`       | n    | Undo tree                       |
 | `<leader>sR`       | n    | Resume last picker              |
 | `<leader>st`       | n    | Todo comments                   |
-| `<leader>fb`       | n    | Buffers                         |
 | `<leader>S`        | n    | Select scratch buffer           |
 | `<leader>s"`       | n    | Registers                       |
 | `<leader>s/`       | n    | Search history                  |
@@ -327,6 +321,7 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>sj`       | n    | Jumps                           |
 | `<leader>sm`       | n    | Marks                           |
 | `<leader>sM`       | n    | Man pages                       |
+| `<leader>sn`       | n    | Notification history            |
 | `<leader>sp`       | n    | Search plugin spec              |
 | `<leader>sq` / `sl`| n    | Quickfix list / location list   |
 | `<leader>snh`      | n    | Noice history                   |
@@ -356,29 +351,6 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>um` | Toggle markdown render (in buffer)   |
 | `<leader>un` | Dismiss all notifications            |
 | `<leader>ur` | Redraw / clear hlsearch / diff update|
-
-## Search
-
-| Key          | Mode | Action                        |
-| ------------ | ---- | ----------------------------- |
-| `<leader>sg` | n    | Search global (Spectre)       |
-| `<leader>sw` | n    | Search word under cursor      |
-| `<leader>sf` | n    | Search in current file        |
-
-### Spectre Keymaps (in search buffer)
-
-| Key          | Action              |
-| ------------ | ------------------- |
-| `dd`         | Toggle item         |
-| `<CR>`       | Open file           |
-| `<leader>q`  | Send to quickfix    |
-| `<leader>c`  | Replace command     |
-| `<leader>o`  | Show options        |
-| `<leader>rc` | Replace current line|
-| `<leader>R`  | Replace all         |
-| `<leader>v`  | Change view mode    |
-| `ti`         | Toggle ignore case  |
-| `th`         | Toggle hidden files |
 
 ## Plugins
 
@@ -473,10 +445,7 @@ prefix, some keep it for their own menus). `;t` from normal mode always works.
 
 | Key          | Mode | Action              |
 | ------------ | ---- | ------------------- |
-| `<leader>gb` | n    | Toggle git blame    |
-| `<leader>go` | n    | Open commit URL     |
-| `<leader>gc` | n    | Copy commit URL     |
-| `<leader>gf` | n    | Copy file URL       |
+| `<leader>gb` | n    | Toggle git blame line (gitsigns) |
 | `<leader>gd` | n    | Open diff view      |
 | `<leader>gH` | n    | File history        |
 | `<leader>gs` | n    | Git status picker   |

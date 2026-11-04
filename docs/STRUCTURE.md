@@ -25,12 +25,11 @@ lua/plugins/                 one file per context, each returns a lazy.nvim spec
   lsp.lua                    mason, nvim-lspconfig, server configs, diagnostics
   completion.lua             blink.cmp (LSP, snippets, path, buffer sources)
   treesitter.lua             parsers, highlight/indent/fold wiring, textobjects
-  editor.lua                 flash, which-key, trouble, todo, mini.*, better-escape,
+  editor.lua                 flash, which-key, trouble, todo, mini.*,
                              rainbow-delimiters, session restore
   ui.lua                     colorscheme, mini.icons, noice, lualine, breadcrumb
-  git.lua                    git-blame, diffview, lazygit, gitsigns
+  git.lua                    diffview, gitsigns
   formatting.lua             conform.nvim and format on save
-  search.lua                 spectre search & replace
   opencode.lua               opencode AI integration
   django.lua                 Django: basedpyright/ruff/djls, djlint, mypy, venv-selector
   nextjs.lua                 Next.js: vtsls/eslint keymaps, emmet server, mdx filetype

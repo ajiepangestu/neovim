@@ -89,22 +89,13 @@ cover `markdown.mdx`).
 
 | Plugin | Description |
 |--------|-------------|
-| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column, hunk staging |
-| [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) | LazyGit integration |
-| [git-blame.nvim](https://github.com/f-person/git-blame.nvim) | Inline git blame (like GitLens) |
+| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column, hunk staging, line blame |
 | [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Enhanced diff viewer for git changes |
-
-## Search & Replace
-
-| Plugin | Description |
-|--------|-------------|
-| [nvim-spectre](https://github.com/nvim-pack/nvim-spectre) | VS Code-like search and replace with live preview |
 
 ## Quality of Life
 
 | Plugin | Description |
 |--------|-------------|
-| [better-escape.nvim](https://github.com/max397574/better-escape.nvim) | Exit insert mode with `jj` |
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets/parentheses |
 
 ## Editor
@@ -147,8 +138,7 @@ Neovim's built-in `vim.lsp.enable`. Mason installs the binaries.
 | `cssls` | CSS / SCSS / LESS properties and colours |
 | `gopls` | Go (Fiber) |
 | `dockerls` | Dockerfile instructions, flags and formatting |
-| `omnisharp` | C# / .NET |
-| `fsautocomplete` | F# |
+| `omnisharp` | C# (.NET) |
 
 ### Which server answers in a markup buffer
 
@@ -227,21 +217,19 @@ it, and nothing reports the loss: the packages simply never install.
 | `css-lsp` | CSS LSP (`vscode-css-language-server`) |
 | `emmet-language-server` | Emmet abbreviations |
 | `gofumpt`, `goimports` | Go formatters |
-| `omnisharp` / `fsautocomplete` | C# / F# LSP |
 | `prettier`, `prettierd` | Prettier formatter, and its daemon |
 | `golangci-lint` | Go linter (errcheck, unused, …) |
 | `dockerfile-language-server` | Dockerfile LSP (`docker-langserver`) |
 | `hadolint` | Dockerfile linter, with shellcheck over `RUN` bodies |
 | `gomodifytags` | Add/remove struct tags (`:GoTagAdd`) |
 | `gotests` | Generate table-driven tests (`:GoTests`) |
-| `csharpier`, `fantomas` | C# / F# formatters |
 | `stylua`, `shfmt` | Lua and shell formatters |
 
 ## Treesitter Parsers
 
 Installed automatically on first start, see `ensure_installed` in
-`lua/plugins/treesitter.lua` plus the per-stack files — 38 in total: bash, c,
-c_sharp, css, diff, dockerfile, fsharp, gitignore, go, gomod, gosum, gotmpl,
+`lua/plugins/treesitter.lua` plus the per-stack files — 36 in total: bash, c,
+css, diff, dockerfile, gitignore, go, gomod, gosum, gotmpl,
 gowork, graphql, html, htmldjango, http, javascript, jsdoc, json, lua, luadoc,
 luap, markdown, markdown_inline, printf, python, query, regex, scss, sql, toml,
 tsx, typescript, vim, vimdoc, xml, yaml.

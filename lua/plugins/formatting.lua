@@ -56,7 +56,6 @@ return {
 				-- is the actual formatter.
 				python = { "ruff_fix", "ruff_format" },
 				cs = { "csharpier" },
-				fsharp = { "fantomas" },
 				css = prettier,
 				graphql = prettier,
 				handlebars = prettier,

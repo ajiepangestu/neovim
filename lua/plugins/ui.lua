@@ -304,7 +304,7 @@ return {
 	-- barbecue: winbar breadcrumb UI using navic
 	{
 		"utilyre/barbecue.nvim",
-		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
+		dependencies = { "SmiteshP/nvim-navic" },
 		opts = {
 			show_dirname = true,
 			show_basename = true,

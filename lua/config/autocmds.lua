@@ -68,7 +68,6 @@ vim.api.nvim_create_autocmd("FileType", {
 		"lspinfo",
 		"notify",
 		"qf",
-		"spectre_panel",
 		"startuptime",
 	},
 	callback = function(event)

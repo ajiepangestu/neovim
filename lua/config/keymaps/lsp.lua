@@ -32,7 +32,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- Actions
 		map("<space>a", vim.lsp.buf.code_action, "Code action")
 		map("<space>f", function()
-			vim.lsp.buf.format({ async = true })
+			require("config.util").format()
 		end, "Format")
 		map("<space>r", vim.lsp.buf.rename, "Rename")
 
@@ -50,12 +50,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			vim.diagnostic.jump({ count = -vim.v.count1 })
 			vim.schedule(vim.diagnostic.open_float)
 		end, "Previous diagnostic")
-		map("<leader>le", function()
-			Snacks.picker.diagnostics({ buf = 0 })
-		end, "Buffer diagnostics")
-		map("<leader>lE", function()
-			Snacks.picker.diagnostics()
-		end, "All diagnostics")
 		map("<leader>li", "<cmd>checkhealth vim.lsp<cr>", "LSP info")
 	end,
 })

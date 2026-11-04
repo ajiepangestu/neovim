@@ -18,7 +18,6 @@ return {
 				"css",
 				"diff",
 				"dockerfile",
-				"fsharp",
 				"graphql",
 				"html",
 				"htmldjango",

@@ -161,17 +161,6 @@ return {
 	-- Language aware `gc` commenting (jsx, vue, ...)
 	{ "folke/ts-comments.nvim", event = "VeryLazy", opts = {} },
 
-	-- Exit insert mode with jj
-	{
-		"max397574/better-escape.nvim",
-		event = "InsertEnter",
-		opts = {
-			timeout = 300,
-			default_mappings = false,
-			mappings = { i = { j = { j = "<Esc>" } } },
-		},
-	},
-
 	-- Rainbow brackets/parentheses
 	{
 		"HiPhish/rainbow-delimiters.nvim",
