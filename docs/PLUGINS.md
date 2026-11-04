@@ -97,6 +97,8 @@ cover `markdown.mdx`).
 | Plugin | Description |
 |--------|-------------|
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets/parentheses |
+| [nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag) | Auto close and auto rename HTML/JSX/TSX/Angular/Django tags |
+| [nvim-surround](https://github.com/kylechui/nvim-surround) | Add, change, and delete surrounds (`ys`, `cs`, `ds`) |
 
 ## Editor
 

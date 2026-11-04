@@ -134,6 +134,21 @@ return {
 		},
 	},
 
+	-- Auto close and auto rename HTML/JSX/TSX/Angular/Django tags
+	{
+		"windwp/nvim-ts-autotag",
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {},
+	},
+
+	-- Surround actions: ys{motion}{char}, cs{target}{replacement}, ds{target}
+	{
+		"kylechui/nvim-surround",
+		version = "*",
+		event = "VeryLazy",
+		opts = {},
+	},
+
 	-- Extra a/i text objects: af/if (function), ac/ic (class), a?/i? …
 	{
 		"nvim-mini/mini.ai",

@@ -499,6 +499,21 @@ htmldjango and gohtmltmpl.
 | ------------ | ---- | ------------------------------- |
 | `<leader>ce` | n, v | Wrap selection with abbreviation |
 
+## Surround (nvim-surround)
+
+Operate on surrounding delimiter pairs (quotes, brackets, tags).
+
+| Key | Mode | Example | Action |
+| --- | ---- | ------- | ------ |
+| `ys{motion}{char}` | n | `ysiw"` | Add `"` around word (`word` -> `"word"`) |
+| `ys{motion}t` | n | `ysiw<div>` | Wrap word with HTML tag `<div>word</div>` |
+| `cs{target}{replacement}` | n | `cs"'` | Change surrounding `"` to `'` |
+| `cs{target}t` | n | `cst<p>` | Change tag `<div ...>` to `<p>` |
+| `ds{target}` | n | `ds"` | Delete surrounding `"` |
+| `dst` | n | `dst` | Delete surrounding HTML tag |
+| `S{char}` | v | `S"` (in visual mode) | Wrap selected text in `"` |
+| `gS{char}` | v | `gS<div>` | Wrap selected text in tags on newlines |
+
 ## Known Keymap Conflicts
 
 These are deliberate, not bugs. They are listed so the behaviour is not
