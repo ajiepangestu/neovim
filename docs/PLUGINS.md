@@ -91,6 +91,7 @@ cover `markdown.mdx`).
 |--------|-------------|
 | [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git signs in sign column, hunk staging, line blame |
 | [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Enhanced diff viewer for git changes |
+| [git-conflict.nvim](https://github.com/akinsho/git-conflict.nvim) | Visual merge conflict markers resolution (`co`, `ct`, `cb`, `c0`) |
 
 ## Quality of Life
 

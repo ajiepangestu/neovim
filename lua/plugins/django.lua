@@ -1,5 +1,15 @@
 local Util = require("config.util")
 
+-- Auto-detect Django template files as htmldjango
+vim.filetype.add({
+	pattern = {
+		[".*/templates/.*%.html"] = "htmldjango",
+		[".*%.jinja"] = "htmldjango",
+		[".*%.jinja2"] = "htmldjango",
+		[".*%.j2"] = "htmldjango",
+	},
+})
+
 --------------------------------------------------------------------------------
 -- mypy
 --

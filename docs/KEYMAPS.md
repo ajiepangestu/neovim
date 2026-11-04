@@ -90,9 +90,9 @@ straight there, several results open a list with a preview (like VS Code).
 | `grt`        | n    | Type definition (picker)  |
 | `gh`         | n    | Hover                     |
 | `gs`         | n    | Signature help            |
-| `<space>a`   | n    | Code action               |
-| `<space>f`   | n    | Format buffer             |
-| `<space>r`   | n    | Rename                    |
+| `<space>a` / `<leader>ca` | n, x | Code action           |
+| `<space>f` / `<leader>cf` | n, x | Format buffer         |
+| `<space>r` / `<leader>cr` | n    | Rename                |
 | `<space>s`   | n    | Workspace symbol          |
 | `<space>d`   | n    | Document symbol           |
 | `E`          | n    | Show diagnostic float     |
@@ -460,6 +460,19 @@ prefix, some keep it for their own menus). `;t` from normal mode always works.
 | `<leader>ghS` / `ghR` | n | Stage / reset buffer |
 | `<leader>ghp`| n    | Preview hunk inline |
 | `<leader>ghd`| n    | Diff this file      |
+
+### Git Conflicts (git-conflict.nvim)
+
+When viewing files with merge conflict markers:
+
+| Key  | Action |
+| ---- | ------ |
+| `co` | Choose ours |
+| `ct` | Choose theirs |
+| `cb` | Choose both |
+| `c0` | Choose none |
+| `]x` | Next conflict |
+| `[x` | Previous conflict |
 
 ## Completion (blink.cmp, insert mode)
 

@@ -3,8 +3,8 @@
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
 	callback = function(args)
-		local map = function(keys, func, desc)
-			vim.keymap.set("n", keys, func, { buffer = args.buf, desc = desc })
+		local map = function(keys, func, desc, mode)
+			vim.keymap.set(mode or "n", keys, func, { buffer = args.buf, desc = desc })
 		end
 
 		-- Navigation through the snacks picker: jumps straight there when there is
@@ -30,11 +30,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("gs", vim.lsp.buf.signature_help, "Signature help")
 
 		-- Actions
-		map("<space>a", vim.lsp.buf.code_action, "Code action")
+		map("<space>a", vim.lsp.buf.code_action, "Code action", { "n", "x" })
+		map("<leader>ca", vim.lsp.buf.code_action, "Code action", { "n", "x" })
 		map("<space>f", function()
 			require("config.util").format()
 		end, "Format")
 		map("<space>r", vim.lsp.buf.rename, "Rename")
+		map("<leader>cr", vim.lsp.buf.rename, "Rename")
 
 		-- Symbols
 		map("<space>s", vim.lsp.buf.workspace_symbol, "Workspace symbol")
