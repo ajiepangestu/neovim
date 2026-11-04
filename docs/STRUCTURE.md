@@ -33,6 +33,8 @@ lua/plugins/                 one file per context, each returns a lazy.nvim spec
   opencode.lua               opencode AI integration
   django.lua                 Django: basedpyright/ruff/djls, djlint, mypy, venv-selector
   nextjs.lua                 Next.js: vtsls/eslint keymaps, emmet server, mdx filetype
+  angular.lua                Angular: angularls template LSP, project gating
+  dotnet.lua                 .NET: omnisharp LSP, csharpier formatting, coreclr DAP
   go.lua                     Go + Fiber: gopls, gofumpt/goimports, gotmpl templates
   docker.lua                 Docker: dockerls, hadolint, lazydocker/compose terminals
   database.lua               dadbod + dadbod-ui, SQL completion from the live connection

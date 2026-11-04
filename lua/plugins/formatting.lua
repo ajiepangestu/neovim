@@ -55,7 +55,6 @@ return {
 				-- `ruff_fix` is what the old `ruff` entry resolved to; `ruff_format`
 				-- is the actual formatter.
 				python = { "ruff_fix", "ruff_format" },
-				cs = { "csharpier" },
 				css = prettier,
 				graphql = prettier,
 				handlebars = prettier,

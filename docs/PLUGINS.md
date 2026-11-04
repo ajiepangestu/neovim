@@ -139,6 +139,7 @@ Neovim's built-in `vim.lsp.enable`. Mason installs the binaries.
 | `gopls` | Go (Fiber) |
 | `dockerls` | Dockerfile instructions, flags and formatting |
 | `omnisharp` | C# (.NET) |
+| `angularls` | Angular template language server |
 
 ### Which server answers in a markup buffer
 
@@ -216,6 +217,9 @@ it, and nothing reports the loss: the packages simply never install.
 | `html-lsp` | HTML LSP (`vscode-html-language-server`) |
 | `css-lsp` | CSS LSP (`vscode-css-language-server`) |
 | `emmet-language-server` | Emmet abbreviations |
+| `angular-language-server` | Angular template language server |
+| `omnisharp` | C# (.NET) LSP |
+| `csharpier` | C# formatter |
 | `gofumpt`, `goimports` | Go formatters |
 | `prettier`, `prettierd` | Prettier formatter, and its daemon |
 | `golangci-lint` | Go linter (errcheck, unused, …) |

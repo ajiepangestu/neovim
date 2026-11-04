@@ -18,14 +18,12 @@ return {
 				"css-lsp",
 				"json-lsp",
 				"yaml-language-server",
-				"omnisharp",
 				-- tools
 				"stylua",
 				"shfmt",
 				"ruff",
 				"prettier",
 				"prettierd",
-				"csharpier",
 			},
 		},
 		config = function(_, opts)
@@ -246,12 +244,6 @@ return {
 						scss = { lint = { unknownAtRules = "ignore" } },
 						less = { lint = { unknownAtRules = "ignore" } },
 					},
-				},
-				-- C# (.NET)
-				omnisharp = {
-					enable_roslyn_analyzers = true,
-					organize_imports_on_format = true,
-					enable_import_completion = true,
 				},
 			},
 
