@@ -15,6 +15,7 @@ Engineered for full-stack development across 5 core technology stacks:
 
 | Guide | Description |
 |---|---|
+| [System Requirements & Global Tools](docs/REQUIREMENTS.md) | Host OS packages, language SDKs, and CLI companion tools |
 | [Keymaps Reference](docs/KEYMAPS.md) | Complete keybinding index, chords, and conflict notes (Leader: `;`) |
 | [Plugins List](docs/PLUGINS.md) | Complete inventory of installed plugins and their roles |
 | [Config Structure](docs/STRUCTURE.md) | Architectural layout of `lua/config/` and modular `lua/plugins/` |
