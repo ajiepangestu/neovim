@@ -53,4 +53,16 @@ return {
 			vim.list_extend(opts.ensure_installed, { "coreclr" })
 		end,
 	},
+
+	-- Test runner with neotest
+	{
+		"nvim-neotest/neotest",
+		optional = true,
+		dependencies = { "Issafalcon/neotest-dotnet" },
+		opts = {
+			adapters = {
+				["neotest-dotnet"] = {},
+			},
+		},
+	},
 }

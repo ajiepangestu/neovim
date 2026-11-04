@@ -25,7 +25,7 @@
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatter manager (see Formatters by Filetype below) |
 | [basedpyright](https://github.com/DetachHead/basedpyright) | Python LSP with Django ORM support (replaces pyright) |
 | [nvim-lint](https://github.com/mfussenegger/nvim-lint) | Linters the language servers do not cover: `djlint` for Django templates, `hadolint` for Dockerfiles, `golangci-lint` for Go and `mypy` for Python (the last two on write only — both check far more than the file). `mypy` additionally runs only where the project has a mypy config *and* a venv containing mypy, since outside the venv it has no `django-stubs` |
-| [neotest](https://github.com/nvim-neotest/neotest) | Test runner, keys under `<leader>N`. Adapters: [neotest-golang](https://github.com/fredrikaverpil/neotest-golang), [neotest-python](https://github.com/nvim-neotest/neotest-python), [neotest-vitest](https://github.com/marilari88/neotest-vitest), [neotest-jest](https://github.com/nvim-neotest/neotest-jest) |
+| [neotest](https://github.com/nvim-neotest/neotest) | Test runner, keys under `<leader>N`. Adapters: [neotest-golang](https://github.com/fredrikaverpil/neotest-golang), [neotest-python](https://github.com/nvim-neotest/neotest-python), [neotest-vitest](https://github.com/marilari88/neotest-vitest), [neotest-jest](https://github.com/nvim-neotest/neotest-jest), [neotest-dotnet](https://github.com/Issafalcon/neotest-dotnet) |
 
 ### Formatters by Filetype
 
@@ -99,6 +99,8 @@ cover `markdown.mdx`).
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets/parentheses |
 | [nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag) | Auto close and auto rename HTML/JSX/TSX/Angular/Django tags |
 | [nvim-surround](https://github.com/kylechui/nvim-surround) | Add, change, and delete surrounds (`ys`, `cs`, `ds`) |
+| [nvim-highlight-colors](https://github.com/brenoprata10/nvim-highlight-colors) | Live preview for Tailwind CSS classes, Hex, RGB, HSL colors |
+| [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context) | Sticky context header for functions and classes (`<leader>uc`) |
 
 ## Editor
 

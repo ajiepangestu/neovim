@@ -114,25 +114,31 @@ return {
 				-- for ruff, and a second would silently replace it.
 				ruff = { root_markers_extra = { ["manage.py"] = true } },
 				basedpyright = {
-					-- Point the server at the project's interpreter. Without this it
-					-- analyses with the python that started Neovim, and every symbol
-					-- from an installed package resolves to nothing: `models.CharField`
-					-- hovers as "Unknown" and goto-definition returns no result unless
-					-- Neovim happens to have been launched from an activated shell.
-					-- Picking a venv later with :VenvSelect updates the running client,
-					-- so this only has to get startup right.
+					-- Point the server at the project's interpreter and search paths.
+					-- Without this it analyses with the python that started Neovim,
+					-- and local Django app imports fail to resolve.
 					before_init = function(_, config)
+						config.settings.python = config.settings.python or {}
 						config.settings.python.pythonPath = Util.python_path(config.root_dir)
+
+						config.settings.basedpyright = config.settings.basedpyright or {}
+						local analysis = config.settings.basedpyright.analysis or {}
+						analysis.autoSearchPaths = true
+						local extra = analysis.extraPaths or {}
+						if config.root_dir then
+							table.insert(extra, config.root_dir)
+							if vim.uv.fs_stat(config.root_dir .. "/apps") then
+								table.insert(extra, config.root_dir .. "/apps")
+							end
+						end
+						analysis.extraPaths = extra
+						config.settings.basedpyright.analysis = analysis
 					end,
 					-- A Django project is not guaranteed to have any of the markers
 					-- basedpyright ships with (pyproject.toml, setup.py,
 					-- requirements.txt, .git); manage.py is the one file it always has.
 					-- Without a root the server runs in single-file mode, where `grr`
 					-- only ever finds references inside the current buffer.
-					--
-					-- It matters when those markers DO exist, too: in a monorepo the
-					-- .git at the top would otherwise make the whole repo the python
-					-- root, while manage.py picks out the Django app directory.
 					root_markers_extra = { ["manage.py"] = true },
 					settings = {
 						python = {},
@@ -141,6 +147,7 @@ return {
 								typeCheckingMode = "basic",
 								diagnosticMode = "openFilesOnly",
 								autoImportCompletions = true,
+								autoSearchPaths = true,
 							},
 						},
 					},

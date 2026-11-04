@@ -348,6 +348,7 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>ui` | Inspect position (highlights)        |
 | `<leader>uA` | Toggle tabline                       |
 | `<leader>uT` | Toggle treesitter highlight          |
+| `<leader>uc` | Toggle treesitter context (sticky header) |
 | `<leader>um` | Toggle markdown render (in buffer)   |
 | `<leader>un` | Dismiss all notifications            |
 | `<leader>ur` | Redraw / clear hlsearch / diff update|

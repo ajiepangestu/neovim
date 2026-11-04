@@ -301,6 +301,17 @@ return {
 		},
 	},
 
+	-- Highlight colors: hex, rgb, hsl, and Tailwind CSS classes
+	{
+		"brenoprata10/nvim-highlight-colors",
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {
+			render = "virtual",
+			virtual_symbol = "■",
+			enable_tailwind = true,
+		},
+	},
+
 	-- barbecue: winbar breadcrumb UI using navic
 	{
 		"utilyre/barbecue.nvim",
