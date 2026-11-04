@@ -190,7 +190,7 @@ whichever plugin file is merged last silently replaces the others — `lua/plugi
 is imported in alphabetical order, so `django.lua` defining `setup.ruff` would
 have thrown away the one in `lsp.lua` that hands hover to basedpyright.
 
-Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_FIBER.md).
+Stack specific notes: [DJANGO_SETUP.md](./DJANGO_SETUP.md), [GO_FIBER.md](./GO_FIBER.md), [DOTNET_SETUP.md](./DOTNET_SETUP.md), [ANGULAR_SETUP.md](./ANGULAR_SETUP.md), [MONOREPO_SETUP.md](./MONOREPO_SETUP.md).
 
 ## Mason Installed Tools
 

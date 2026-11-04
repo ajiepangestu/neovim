@@ -53,6 +53,39 @@ return {
 			vim.list_extend(opts.ensure_installed, { "coreclr" })
 		end,
 	},
+	{
+		"mfussenegger/nvim-dap",
+		optional = true,
+		opts = function()
+			local dap = require("dap")
+			if not dap.adapters.coreclr then
+				dap.adapters.coreclr = {
+					type = "executable",
+					command = "netcoredbg",
+					args = { "--interpreter=vscode" },
+				}
+			end
+
+			dap.configurations.cs = vim.list_extend(dap.configurations.cs or {}, {
+				{
+					type = "coreclr",
+					name = ".NET: Launch DLL",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopAtEntry = false,
+				},
+				{
+					type = "coreclr",
+					name = ".NET: Attach to process",
+					request = "attach",
+					processId = require("dap.utils").pick_process,
+				},
+			})
+		end,
+	},
 
 	-- Test runner with neotest
 	{

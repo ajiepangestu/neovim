@@ -153,7 +153,7 @@ and a key that is both a mapping and a prefix waits out `timeoutlen` — see
 Known Keymap Conflicts below.
 
 Adapters come from the stack files: delve for Go, debugpy for Python/Django,
-vscode-js-debug for Node and Chrome. A project's own `.vscode/launch.json` is
+vscode-js-debug for Node and Chrome, and netcoredbg for .NET (C#). A project's own `.vscode/launch.json` is
 read on every `<leader>Dc`, so configurations defined there show up in the
 picker without being restated in this config.
 
