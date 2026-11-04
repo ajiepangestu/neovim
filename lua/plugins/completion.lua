@@ -21,7 +21,42 @@ return {
 
 			completion = {
 				accept = { auto_brackets = { enabled = true } },
-				menu = { draw = { treesitter = { "lsp" } } },
+				menu = {
+					draw = {
+						treesitter = { "lsp" },
+						components = {
+							kind_icon = {
+								ellipsis = false,
+								text = function(ctx)
+									local icon = ctx.kind_icon
+									if ctx.item.source_name == "LSP" then
+										local ok, color = pcall(require, "nvim-highlight-colors")
+										if ok then
+											local color_item = color.format(ctx.item.documentation, { kind = ctx.kind })
+											if color_item and color_item.abbr ~= "" then
+												icon = color_item.abbr
+											end
+										end
+									end
+									return icon .. ctx.icon_gap
+								end,
+								highlight = function(ctx)
+									local highlight = "BlinkCmpKind" .. ctx.kind
+									if ctx.item.source_name == "LSP" then
+										local ok, color = pcall(require, "nvim-highlight-colors")
+										if ok then
+											local color_item = color.format(ctx.item.documentation, { kind = ctx.kind })
+											if color_item and color_item.abbr_hl_group then
+												highlight = color_item.abbr_hl_group
+											end
+										end
+									end
+									return highlight
+								end,
+							},
+						},
+					},
+				},
 				documentation = { auto_show = true, auto_show_delay_ms = 200 },
 				ghost_text = { enabled = false },
 			},

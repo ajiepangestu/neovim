@@ -102,6 +102,7 @@ cover `markdown.mdx`).
 | [nvim-surround](https://github.com/kylechui/nvim-surround) | Add, change, and delete surrounds (`ys`, `cs`, `ds`) |
 | [nvim-highlight-colors](https://github.com/brenoprata10/nvim-highlight-colors) | Live preview for Tailwind CSS classes, Hex, RGB, HSL colors |
 | [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context) | Sticky context header for functions and classes (`<leader>uc`) |
+| [mini.splitjoin](https://github.com/nvim-mini/mini.splitjoin) | Toggle single-line and multi-line arguments/props/structs (`gS`) |
 
 ## Editor
 

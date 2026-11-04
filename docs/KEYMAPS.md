@@ -18,6 +18,7 @@ Leader key: `;`
 | `j` / `k`   | n, x       | Move by display line when no count is given           |
 | `<A-j>` / `<A-k>` | n, i, v | Move line(s) down / up                            |
 | `gco` / `gcO` | n        | Add comment below / above                             |
+| `gS`        | n          | Split / join arguments, props, structs (mini.splitjoin)|
 | `s` / `S`   | n, x, o    | Flash jump / flash treesitter                         |
 | `r`         | o          | Remote flash (operate on a distant target)            |
 | `R`         | o, x       | Flash treesitter search                               |

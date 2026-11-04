@@ -149,6 +149,13 @@ return {
 		opts = {},
 	},
 
+	-- Split and join arguments, props, structs, and arrays with `gS`
+	{
+		"nvim-mini/mini.splitjoin",
+		event = "VeryLazy",
+		opts = {},
+	},
+
 	-- Extra a/i text objects: af/if (function), ac/ic (class), a?/i? …
 	{
 		"nvim-mini/mini.ai",
