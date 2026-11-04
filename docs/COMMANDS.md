@@ -10,11 +10,7 @@
 | `:TSUpdate` | Update treesitter parsers |
 | `:VenvSelect` | Pick the Python virtualenv for the LSP |
 | `:Trouble diagnostics toggle` | Toggle the diagnostics list |
-| `:LazyGit` | Open LazyGit in floating terminal |
-| `:LazyGitConfig` | Open LazyGit config |
-| `:LazyGitCurrentFile` | Open LazyGit focused on current file |
-| `:LazyGitFilter` | Open LazyGit with filter |
-| `:LazyGitFilterCurrentFile` | Open LazyGit filtered to current file |
+| `:lua Snacks.lazygit()` | Open LazyGit in floating terminal (or press `<leader>gg`) |
 
 ## Project Setup
 
