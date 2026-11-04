@@ -59,6 +59,7 @@ return {
 				graphql = prettier,
 				handlebars = prettier,
 				html = prettier,
+				htmlangular = prettier,
 				javascript = web,
 				javascriptreact = web,
 				json = web,
