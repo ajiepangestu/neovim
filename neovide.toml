@@ -1,0 +1,21 @@
+# Neovide Configuration
+# File ini disimpan di repo Neovim: ~/.config/nvim/neovide.toml
+# Symlink ke lokasi config Neovide:
+#   ln -sf ~/.config/nvim/neovide.toml ~/.config/neovide/config.toml
+
+# Wajib dinonaktifkan agar tidak bentrok dengan noice.nvim (ext_messages/ext_cmdline)
+startup-message-capture = false
+
+# Vsync aktif untuk animasi mulus tanpa screen tearing
+vsync = true
+
+# Lepas proses Neovide dari shell saat dijalankan dari terminal (neovide .)
+fork = true
+
+# Pengaturan Window
+# maximized = false
+
+# Pengaturan Font (opsional, font utama sudah diatur lewat lua/config/options.lua)
+# [font]
+# normal = ["Iosevka Nerd Font Mono"]
+# size = 11.0

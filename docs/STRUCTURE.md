@@ -20,6 +20,7 @@ lua/config/
   monorepo.lua               :MonorepoSetup
   django.lua                 :DjangoInstall, :VenvStatus
   workspace.lua              :Workspace* commands and <leader>W* maps
+  neovide.lua                Neovide GUI setup, full animation, zoom & keymaps
 lua/plugins/                 one file per context, each returns a lazy.nvim spec
   snacks.lua                 picker, explorer, terminal, dashboard, notifier + picker keymaps
   lsp.lua                    mason, nvim-lspconfig, server configs, diagnostics

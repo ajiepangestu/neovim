@@ -41,6 +41,7 @@ remain opt-in; install them when you want to use their corresponding shortcuts.
 | [Go Fiber Setup](docs/GO_FIBER.md) | gopls, gofumpt, gotmpl templates, delve DAP, and neotest-golang |
 | [Monorepo Setup](docs/MONOREPO_SETUP.md) | Django API + Next.js frontend workflow and `:MonorepoSetup` |
 | [Tmux Integration](docs/TMUX.md) | Window navigation and tmux workflow |
+| [Neovide Integration](docs/NEOVIDE.md) | Neovide GUI setup, font configuration, and noice compatibility |
 
 ---
 
