@@ -17,6 +17,7 @@
 | [barbecue.nvim](https://github.com/utilyre/barbecue.nvim) | Winbar breadcrumb (LSP context) |
 | [nvim-navic](https://github.com/SmiteshP/nvim-navic) | LSP document symbol provider for breadcrumbs |
 | [noice.nvim](https://github.com/folke/noice.nvim) | Cmdline / message UI |
+| [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration: ask about a range, append motions to a prompt, and toggle its terminal under `<leader>o` / `<C-.>` |
 
 ## LSP / Formatting / Linting
 
@@ -109,9 +110,16 @@ cover `markdown.mdx`).
 | Plugin | Description |
 |--------|-------------|
 | [blink.cmp](https://github.com/saghen/blink.cmp) | Completion engine (LSP, snippets, path, buffer) |
+| [friendly-snippets](https://github.com/rafamadriz/friendly-snippets) | Community snippet collection consumed by blink.cmp |
 | [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Parsers, highlighting, indent, folds (`main` branch) |
+| [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Treesitter-aware text objects and motions |
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP server defaults, wired up with `vim.lsp.config`/`enable` |
 | [mason.nvim](https://github.com/mason-org/mason.nvim) | Installs LSP servers and formatters |
+| [mason-nvim-dap.nvim](https://github.com/jay-babu/mason-nvim-dap.nvim) | Installs and configures Mason-managed debug adapters |
+| [nvim-dap](https://github.com/mfussenegger/nvim-dap) | Debug Adapter Protocol client; commands live under `<leader>D` |
+| [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) | Variables, watches, call stack, REPL, and breakpoint UI for nvim-dap |
+| [nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | Shows debug values next to source code while a DAP session is stopped |
+| [nvim-nio](https://github.com/nvim-neotest/nvim-nio) | Async runtime dependency shared by neotest and nvim-dap-ui |
 | [flash.nvim](https://github.com/folke/flash.nvim) | Jump anywhere on screen with `s` |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | Keybinding hints |
 | [trouble.nvim](https://github.com/folke/trouble.nvim) | Diagnostics / references / symbols list |
@@ -124,6 +132,7 @@ cover `markdown.mdx`).
 | [persistence.nvim](https://github.com/folke/persistence.nvim) | Session save/restore |
 | [lazydev.nvim](https://github.com/folke/lazydev.nvim) | Lua LSP support for editing this config |
 | [venv-selector.nvim](https://github.com/linux-cultist/venv-selector.nvim) | Pick the Python virtualenv (`<leader>cv`) |
+| [schemastore.nvim](https://github.com/b0o/schemastore.nvim) | JSON and YAML schema catalogue used by language-server configuration, including Compose schemas |
 
 ## Language Servers
 

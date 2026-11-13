@@ -19,9 +19,9 @@ Perkakas berikut **wajib terpasang di host OS** (pada `$PATH`):
 
 ### Perintah Instalasi OS:
 
-#### Fedora / RHEL:
+#### Arch / CachyOS:
 ```bash
-sudo dnf install -y neovim git ripgrep fd-find curl tar unzip
+sudo pacman -S --needed neovim git ripgrep fd curl tar unzip
 ```
 
 #### Ubuntu / Debian:
@@ -50,8 +50,9 @@ Perkakas Terminal UI yang diintegrasikan langsung ke dalam Neovim:
 
 | Perkakas | Shortcut di Neovim | Keterangan & Cara Pasang |
 |---|---|---|
-| **`lazygit`** | **`;gg`** | TUI Git client dalam floating window.<br>• **Fedora:** `sudo dnf install lazygit` atau `go install github.com/jesseduffield/lazygit@latest`<br>• **Ubuntu:** download dari GitHub releases atau PPA.<br>• **macOS:** `brew install lazygit` |
+| **`lazygit`** | **`;gg`** | TUI Git client dalam floating window.<br>• **Arch/CachyOS:** `sudo pacman -S lazygit` atau `go install github.com/jesseduffield/lazygit@latest`<br>• **Ubuntu:** download dari GitHub releases atau PPA.<br>• **macOS:** `brew install lazygit` |
 | **`lazydocker`** | **`;kd`** | TUI Docker container manager.<br>• Pasang via: `curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh \| bash` |
+| **`opencode`** | **`;oa`**, **`;os`**, `<C-.>` | CLI AI coding assistant used by `opencode.nvim`. Install it using the method documented by the OpenCode project, then verify with `opencode --version`. The plugin starts `opencode --port` in a Snacks terminal when needed. |
 
 ---
 

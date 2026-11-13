@@ -5,7 +5,7 @@ There is no distribution layer: every plugin, option, autocmd and keymap lives i
 this repository.
 
 ```
-init.lua                     load order: options -> lazy -> autocmds -> keymaps -> commands
+init.lua                     load order: options -> lazy -> autocmds -> keymaps -> monorepo/django/workspace commands
 lua/config/
   lazy.lua                   lazy.nvim bootstrap and setup
   options.lua                vim options, leader key, vim.g.autoformat

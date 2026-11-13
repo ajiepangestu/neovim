@@ -11,6 +11,21 @@ Engineered for full-stack development across 5 core technology stacks:
 
 ---
 
+## Quick Start
+
+1. Install the core tools in [System Requirements & Global Tools](docs/REQUIREMENTS.md).
+2. Clone this repository to `~/.config/nvim`.
+3. Start `nvim`. On its first launch the configuration clones `lazy.nvim` and
+   installs the declared plugins and Mason-managed tools.
+4. Run `:Lazy` to inspect or update plugins and `:Mason` to inspect language
+   tools. Use `:checkhealth` if a provider, executable, or integration is not
+   working as expected.
+
+The optional companion tools (`lazygit`, `lazydocker`, and the OpenCode CLI)
+remain opt-in; install them when you want to use their corresponding shortcuts.
+
+---
+
 ## 📚 Documentation & Guides
 
 | Guide | Description |
