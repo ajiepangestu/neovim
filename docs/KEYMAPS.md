@@ -16,7 +16,12 @@ Leader key: `;`
 | `<leader>cf`| n, x       | Format buffer                                         |
 | `<esc>`     | i, n, s    | Clear search highlight / stop snippet                 |
 | `j` / `k`   | n, x       | Move by display line when no count is given           |
+| `<C-d>` / `<C-u>` | n    | Scroll down / up and center cursor (`zz`)             |
+| `J`         | n          | Join lines while keeping cursor position intact       |
+| `<leader>p` | x          | Paste over selection without overwriting clipboard    |
 | `<A-j>` / `<A-k>` | n, i, v | Move line(s) down / up                            |
+| `<A-S-j>` / `<A-S-k>` | n, v | Duplicate line(s) down / up                       |
+| `<A-S-Down>` / `<A-S-Up>` | n, v | Duplicate line(s) down / up                   |
 | `gco` / `gcO` | n        | Add comment below / above                             |
 | `gS`        | n          | Split / join arguments, props, structs (mini.splitjoin)|
 | `s` / `S`   | n, x, o    | Flash jump / flash treesitter                         |
@@ -372,6 +377,7 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>t`  | n    | Toggle terminal           |
 | `<leader>Th` | n    | Terminal split horizontal (bottom 35%) |
 | `<leader>Tv` | n    | Terminal split vertical (right 40%)    |
+| `<leader>tf` | n    | Terminal split in current file's folder (bottom 35%) |
 | `<leader>ts` / `<S-CR>` | n, v | Send current line / visual selection to terminal |
 | `<leader>tr` | n    | Run current file in split terminal |
 | `<leader>ty` | n    | Copy all terminal output / scrollback to clipboard |

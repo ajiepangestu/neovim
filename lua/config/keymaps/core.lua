@@ -22,6 +22,16 @@ vim.keymap.set("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "Pr
 vim.keymap.set("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 vim.keymap.set("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 
+-- Keep cursor centered during half-page jumps
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down and center" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up and center" })
+
+-- Join lines while keeping cursor position intact
+vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines preserving cursor" })
+
+-- Paste over selection without replacing clipboard with deleted text
+vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without overwriting register" })
+
 -- Escape clears the search highlight and stops an active snippet
 vim.keymap.set({ "i", "n", "s" }, "<esc>", function()
 	vim.cmd("noh")
@@ -51,6 +61,16 @@ vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
 vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
 vim.keymap.set("v", "<A-j>", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move down" })
 vim.keymap.set("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move up" })
+
+-- Duplicate lines / selection
+vim.keymap.set("n", "<A-S-Down>", "<cmd>t.<cr>", { desc = "Duplicate line down" })
+vim.keymap.set("n", "<A-S-Up>", "<cmd>t.-1<cr>", { desc = "Duplicate line up" })
+vim.keymap.set("n", "<A-S-j>", "<cmd>t.<cr>", { desc = "Duplicate line down" })
+vim.keymap.set("n", "<A-S-k>", "<cmd>t.-1<cr>", { desc = "Duplicate line up" })
+vim.keymap.set("v", "<A-S-Down>", ":t'><cr>gv=gv", { desc = "Duplicate selection down" })
+vim.keymap.set("v", "<A-S-Up>", ":t'<-1<cr>gv=gv", { desc = "Duplicate selection up" })
+vim.keymap.set("v", "<A-S-j>", ":t'><cr>gv=gv", { desc = "Duplicate selection down" })
+vim.keymap.set("v", "<A-S-k>", ":t'<-1<cr>gv=gv", { desc = "Duplicate selection up" })
 
 -- Keep the selection when indenting
 vim.keymap.set("x", "<", "<gv")

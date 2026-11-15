@@ -57,6 +57,14 @@ vim.keymap.set("n", "<leader>Tv", function()
 	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "right", width = 0.40 } })
 end, { desc = "Terminal split vertical (40%)" })
 
+vim.keymap.set("n", "<leader>tf", function()
+	local file_dir = vim.fn.expand("%:p:h")
+	if file_dir == "" or vim.bo.buftype ~= "" then
+		file_dir = terminal_cwd()
+	end
+	Snacks.terminal.open(nil, { cwd = file_dir, win = { position = "bottom", height = 0.35 } })
+end, { desc = "Terminal in file directory" })
+
 -- Split off another terminal without leaving terminal mode first.
 vim.keymap.set({ "n", "t" }, "<A-v>", function()
 	Snacks.terminal.open(nil, { cwd = terminal_cwd(), win = { position = "right", width = 0.40 } })
