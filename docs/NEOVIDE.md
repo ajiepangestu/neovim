@@ -117,3 +117,39 @@ Dikonfigurasi untuk pengalaman visual yang sangat halus, sinematik, dan nyaman d
 | `<C-0>` | Normal / Visual | **Reset Zoom** (kembali ke skala 1.0) |
 | `<F11>` | Normal | **Toggle Fullscreen** |
 | `<C-S-v>` | Normal, Visual, Insert, Command | **Paste dari system clipboard** |
+
+---
+
+## 7. Default Editor Setup (CLI & Desktop OS)
+
+Agar Neovide menjadi editor default saat membuka file:
+
+### A. Terminal / Shell Alias (`~/.zsh_aliases`)
+Smart wrapper otomatis membuka Neovide saat ada display GUI (X11 / Wayland), dan fallback ke Neovim terminal saat di remote SSH:
+```bash
+nvim() {
+  if [ -n "$DISPLAY" ] || [ -n "$WAYLAND_DISPLAY" ]; then
+    command neovide "$@"
+  else
+    command nvim "$@"
+  fi
+}
+
+alias vim='nvim'
+alias v='nvim'
+```
+*(Gunakan `command nvim` jika ingin membuka Neovim terminal asli)*.
+
+### B. Default Desktop / File Manager (`xdg-mime`)
+Klik dua kali file teks / kode di file manager OS otomatis membuka Neovide:
+```bash
+xdg-mime default neovide.desktop text/plain
+xdg-mime default neovide.desktop text/markdown
+xdg-mime default neovide.desktop application/json
+```
+
+### C. Environment Variable (`~/.zsh_environments`)
+```bash
+export VISUAL="neovide --no-fork"
+export EDITOR="nvim"
+```
