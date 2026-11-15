@@ -374,9 +374,13 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<leader>Tv` | n    | Terminal split vertical (right 40%)    |
 | `<leader>ts` / `<S-CR>` | n, v | Send current line / visual selection to terminal |
 | `<leader>tr` | n    | Run current file in split terminal |
+| `<leader>ty` | n    | Copy all terminal output / scrollback to clipboard |
+| `<leader>tc` | n    | Clear terminal screen (`clear`) |
 | `<A-t>`      | n, t | Toggle terminal           |
 | `<A-s>`      | n, t | Terminal split horizontal (bottom 35%) |
 | `<A-v>`      | n, t | Terminal split vertical (right 40%)    |
+| `<A-i>`      | n, t | Quick focus jump between editor and terminal |
+| `<A-/>`      | n, t | Quick search in terminal output history |
 | `<A-Up>` / `<A-Down>` | n, t | Resize terminal height (+3 / -3) |
 | `<A-Left>` / `<A-Right>` | n, t | Resize terminal width (-3 / +3) |
 | `<C-h/j/k/l>`| t    | Move to the window left/down/up/right |

@@ -136,6 +136,79 @@ vim.keymap.set("n", "<leader>tr", function()
 	Snacks.terminal.open(cmd, { cwd = terminal_cwd(), win = { position = "bottom", height = 0.35 } })
 end, { desc = "Run current file in terminal" })
 
+-- Helper: find active terminal buffer (current buffer if terminal, or first visible terminal window)
+local function get_active_terminal()
+	if vim.bo.buftype == "terminal" then
+		return vim.api.nvim_get_current_buf(), vim.api.nvim_get_current_win()
+	end
+	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.bo[buf].buftype == "terminal" then
+			return buf, win
+		end
+	end
+	local terms = Snacks.terminal.list()
+	for _, t in ipairs(terms) do
+		if t:win_valid() and t:buf_valid() then
+			return t.buf, t.win
+		end
+	end
+	return nil, nil
+end
+
+-- Yank / Copy all terminal output to clipboard (<leader>ty)
+vim.keymap.set("n", "<leader>ty", function()
+	local buf = get_active_terminal()
+	if not buf then
+		vim.notify("No active terminal found", vim.log.levels.WARN, { title = "Terminal" })
+		return
+	end
+	local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+	local text = table.concat(lines, "\n")
+	vim.fn.setreg("+", text)
+	vim.notify("Terminal buffer copied (" .. #lines .. " lines)", vim.log.levels.INFO, { title = "Terminal" })
+end, { desc = "Copy all terminal output" })
+
+-- Clear terminal screen (<leader>tc)
+vim.keymap.set("n", "<leader>tc", function()
+	local buf = get_active_terminal()
+	if not buf then
+		vim.notify("No active terminal found", vim.log.levels.WARN, { title = "Terminal" })
+		return
+	end
+	local job_id = vim.b[buf].terminal_job_id
+	if job_id then
+		vim.api.nvim_chan_send(job_id, "clear\n")
+	end
+end, { desc = "Clear terminal screen" })
+
+-- Quick focus jump between editor and terminal without closing it (<A-i>)
+vim.keymap.set({ "n", "t" }, "<A-i>", function()
+	if vim.bo.buftype == "terminal" then
+		vim.cmd("wincmd p")
+	else
+		local _, win = get_active_terminal()
+		if win and vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_set_current_win(win)
+			vim.cmd("startinsert")
+		else
+			Snacks.terminal.toggle(nil, { cwd = terminal_cwd() })
+		end
+	end
+end, { desc = "Focus editor <-> terminal" })
+
+-- Quick search inside terminal output (<A-/>)
+vim.keymap.set({ "n", "t" }, "<A-/>", function()
+	local _, win = get_active_terminal()
+	if not win then
+		vim.notify("No active terminal found", vim.log.levels.WARN, { title = "Terminal" })
+		return
+	end
+	vim.api.nvim_set_current_win(win)
+	local keys = vim.api.nvim_replace_termcodes("<C-\\><C-n>/", true, false, true)
+	vim.api.nvim_feedkeys(keys, "n", false)
+end, { desc = "Search in terminal buffer" })
+
 -- Scratch buffers
 vim.keymap.set("n", "<leader>.", function()
 	Snacks.scratch()
