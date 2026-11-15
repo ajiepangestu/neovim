@@ -387,6 +387,9 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | `<A-v>`      | n, t | Terminal split vertical (right 40%)    |
 | `<A-i>`      | n, t | Quick focus jump between editor and terminal |
 | `<A-/>`      | n, t | Quick search in terminal output history |
+| `<A-u>` / `<A-d>` | t | Safe scroll up / down half-page (won't interrupt running agents) |
+| `<A-PageUp>` / `<A-PageDown>` | t | Safe scroll up / down full page |
+| `<ScrollWheelUp/Down>` | t | Safe mouse wheel scroll in terminal |
 | `<A-Up>` / `<A-Down>` | n, t | Resize terminal height (+3 / -3) |
 | `<A-Left>` / `<A-Right>` | n, t | Resize terminal width (-3 / +3) |
 | `<C-h/j/k/l>`| t    | Move to the window left/down/up/right |

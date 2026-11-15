@@ -217,6 +217,14 @@ vim.keymap.set({ "n", "t" }, "<A-/>", function()
 	vim.api.nvim_feedkeys(keys, "n", false)
 end, { desc = "Search in terminal buffer" })
 
+-- Safe scroll inside terminal without sending <Esc> (safe for running AI agents / TUIs)
+vim.keymap.set("t", "<ScrollWheelUp>", "<C-\\><C-n><ScrollWheelUp>", { desc = "Scroll terminal up" })
+vim.keymap.set("t", "<ScrollWheelDown>", "<C-\\><C-n><ScrollWheelDown>", { desc = "Scroll terminal down" })
+vim.keymap.set("t", "<A-u>", "<C-\\><C-n><C-u>", { desc = "Scroll terminal up (half page)" })
+vim.keymap.set("t", "<A-d>", "<C-\\><C-n><C-d>", { desc = "Scroll terminal down (half page)" })
+vim.keymap.set("t", "<A-PageUp>", "<C-\\><C-n><C-b>", { desc = "Scroll terminal up (page)" })
+vim.keymap.set("t", "<A-PageDown>", "<C-\\><C-n><C-f>", { desc = "Scroll terminal down (page)" })
+
 -- Scratch buffers
 vim.keymap.set("n", "<leader>.", function()
 	Snacks.scratch()
