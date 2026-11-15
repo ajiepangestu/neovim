@@ -92,6 +92,11 @@ Leader key is mapped to **`;`** (semicolon).
 | `jj` | Exit insert mode to normal mode |
 | `<C-s>` / `;w` | Save file |
 | `;q` | Close current buffer safely |
+| `<C-d>` / `<C-u>` | Scroll down / up and center cursor (`zz`) |
+| `<A-j>` / `<A-k>` | Move line(s) down / up |
+| `<A-S-j>` / `<A-S-k>` | Duplicate line(s) down / up |
+| `;p` (in visual) | Paste over selection without overwriting clipboard |
+| `J` | Join lines while keeping cursor position intact |
 | `s` / `S` | Jump anywhere on screen via `flash.nvim` |
 | `ys{motion}{char}` | Add delimiter surrounding word (e.g. `ysiw"`) |
 | `cs{target}{replacement}` | Change delimiter surrounding word (e.g. `cs"'` or `cst<p>`) |
@@ -100,19 +105,27 @@ Leader key is mapped to **`;`** (semicolon).
 | `;uc` | Toggle sticky context headers (`treesitter-context`) |
 | `co` / `ct` / `cb` | Git merge conflicts: choose ours / theirs / both (`git-conflict.nvim`) |
 
-### 🚀 Git, Testing & Debugging
+### 🚀 Git, Terminal, Testing & Debugging
 | Key | Action |
 |---|---|
 | `;gg` | Open LazyGit floating terminal |
 | `;gb` | Toggle inline Git blame line |
 | `;gd` | Open Git diff view (`diffview.nvim`) |
+| `;t` / `<A-t>` | Toggle floating terminal |
+| `;Th` / `<A-s>` | Split terminal horizontal (bottom 35%) |
+| `;Tv` / `<A-v>` | Split terminal vertical (right 40%) |
+| `;tf` | Split terminal in current file's directory |
+| `;ts` / `<S-CR>` | Send current line / selection to terminal |
+| `;tr` | Run current file in split terminal |
+| `;ty` | Copy all terminal output to clipboard |
+| `<A-i>` | Quick focus toggle between editor and terminal |
+| `<A-u>` / `<A-d>` | Safe scroll terminal up / down without interrupting running agents |
 | `;Nr` | Run nearest unit test under cursor (`neotest`) |
 | `;Nf` | Run all unit tests in the current file |
 | `;Ns` | Toggle test summary sidebar |
 | `;Dc` | Start / continue debugging session (`nvim-dap`) |
 | `;Db` | Toggle breakpoint on current line |
 | `;Du` | Toggle DAP UI (variables, watches, call stack) |
-| `;t` | Toggle floating terminal |
 | `;au` | Toggle Database UI (`vim-dadbod-ui`) |
 | `;hh` | Send HTTP request under cursor (`kulala.nvim`) |
 

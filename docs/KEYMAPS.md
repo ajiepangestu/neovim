@@ -406,11 +406,18 @@ pending until `timeoutlen` expires. See `lua/config/keymaps/ui.lua`.
 Two ways, both work:
 
 - `<Esc><Esc>` — twice within **200 ms**. This is snacks' `term_normal`.
-- `<C-\><C-n>` — Neovim's built-in, always available.
+- `<C-\><C-n>` — Neovim's built-in, always available and 100% safe.
 
 A single `<Esc>` is deliberately **forwarded to the program** running in the
 terminal; otherwise `<Esc>` in a TUI would be swallowed by Neovim and never
 reach it. That is why the first press does nothing visible.
+
+> [!WARNING]
+> **Running interactive AI Agents / CLI harnesses (e.g. Claude Code, OpenCode):**
+> Do **NOT** use `<Esc><Esc>` while an agent is executing a turn or thinking — the first
+> `<Esc>` will be delivered to the agent process and will abort / interrupt it!
+> Instead, use **`<C-\><C-n>`** to enter normal mode safely without sending any key to the
+> agent, or use the direct safe scroll shortcuts **`<A-u>` / `<A-d>`** and mouse wheel.
 
 ### Why the terminal cwd is memoised
 
