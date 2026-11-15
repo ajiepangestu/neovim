@@ -370,11 +370,15 @@ written is not a thing to find out about afterwards. `<leader>S` runs it.
 | Key          | Mode | Action                    |
 | ------------ | ---- | ------------------------- |
 | `<leader>t`  | n    | Toggle terminal           |
-| `<leader>Th` | n    | Terminal split horizontal (bottom) |
-| `<leader>Tv` | n    | Terminal split vertical (right)    |
+| `<leader>Th` | n    | Terminal split horizontal (bottom 35%) |
+| `<leader>Tv` | n    | Terminal split vertical (right 40%)    |
+| `<leader>ts` / `<S-CR>` | n, v | Send current line / visual selection to terminal |
+| `<leader>tr` | n    | Run current file in split terminal |
 | `<A-t>`      | n, t | Toggle terminal           |
-| `<A-s>`      | n, t | Terminal split horizontal (bottom) |
-| `<A-v>`      | n, t | Terminal split vertical (right)    |
+| `<A-s>`      | n, t | Terminal split horizontal (bottom 35%) |
+| `<A-v>`      | n, t | Terminal split vertical (right 40%)    |
+| `<A-Up>` / `<A-Down>` | n, t | Resize terminal height (+3 / -3) |
+| `<A-Left>` / `<A-Right>` | n, t | Resize terminal width (-3 / +3) |
 | `<C-h/j/k/l>`| t    | Move to the window left/down/up/right |
 | `<Esc><Esc>` | t    | Leave terminal mode (double-tap) |
 | `q`          | n (in a terminal) | Hide the terminal |

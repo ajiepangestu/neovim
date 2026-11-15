@@ -65,6 +65,10 @@ vim.g.neovide_floating_z_height = 10
 vim.g.neovide_floating_blur_amount_x = 2.0
 vim.g.neovide_floating_blur_amount_y = 2.0
 
+-- Dynamic OS Window Titlebar
+vim.opt.title = true
+vim.opt.titlestring = "%t%( %M%)%( (%{expand('%:~:.:h')})%) - Neovide"
+
 --------------------------------------------------------------------------------
 -- 4. Performa & Refresh Rate
 --------------------------------------------------------------------------------
@@ -76,6 +80,17 @@ vim.g.neovide_refresh_rate_idle = 5
 --------------------------------------------------------------------------------
 -- 5. Keymaps Khusus Neovide
 --------------------------------------------------------------------------------
+-- Ganti efek partikel kursor secara interaktif (<leader>uv)
+local vfx_modes = { "railgun", "torpedo", "pixiedust", "sonicboom", "wireframe", "ripple", "" }
+local vfx_idx = 1
+vim.keymap.set("n", "<leader>uv", function()
+	vfx_idx = (vfx_idx % #vfx_modes) + 1
+	local mode = vfx_modes[vfx_idx]
+	vim.g.neovide_cursor_vfx_mode = mode
+	local label = mode == "" and "Mati (Polos)" or mode
+	vim.notify("Cursor VFX: " .. label, vim.log.levels.INFO, { title = "Neovide" })
+end, { desc = "Ganti efek kursor VFX" })
+
 -- Zoom in / out / reset interaktif (<C-=>, <C-->, <C-0>)
 local change_scale = function(delta)
 	vim.g.neovide_scale_factor = (vim.g.neovide_scale_factor or 1.0) * delta

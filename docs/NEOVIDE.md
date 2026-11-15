@@ -111,6 +111,7 @@ Dikonfigurasi untuk pengalaman visual yang sangat halus, sinematik, dan nyaman d
 
 | Key | Mode | Aksi |
 |---|---|---|
+| `<leader>uv` | Normal | **Cycle Cursor VFX** (ganti efek railgun/torpedo/pixiedust/dll) |
 | `<C-=>` | Normal / Visual | **Zoom In** (perbesar ukuran tampilan) |
 | `<C-->` | Normal / Visual | **Zoom Out** (perkecil ukuran tampilan) |
 | `<C-0>` | Normal / Visual | **Reset Zoom** (kembali ke skala 1.0) |
